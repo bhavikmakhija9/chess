@@ -76,10 +76,8 @@ void Board::setWarFormationRows(int i, Colour c)
 void Board::newBoard()
 {
     board.resize(boardDim, vector<Square>(boardDim, Square()));
-    td = new TextDisplay;
     for (int i = 0; i < boardDim; i++)
     {
-
         // Add pieces to the square as per standard chess formations depending on the row
         if (i == 0)
             setWarFormationRows(i, Colour::Black);
@@ -104,7 +102,7 @@ void Board::newBoard()
         for (int j = 0; j < boardDim; j++)
         {
             board[i][j].setCoords(i, j);
-            board[i][j].attach(td);
+            //board[i][j].attach(td);
         }
     }
 }
@@ -124,8 +122,16 @@ void Board::makeMove(int x, int y, int newx, int newy)
     }
 }
 
-std::ostream &operator<<(std::ostream &out, const Board &b)
-{
-    out << *(b.td);
-    return out;
+void Board::attachDisplay(Observer* o) {
+    for (int i = 0; i < boardDim; i++) {
+        for (int j = 0; j < boardDim; j++) {
+            board[i][j].attach(o);
+        }
+    }
 }
+
+// std::ostream &operator<<(std::ostream &out, const Board &b)
+// {
+//     out << *(b.td);
+//     return out;
+// }

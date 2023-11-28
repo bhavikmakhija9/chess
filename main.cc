@@ -1,20 +1,18 @@
 #include <string>
 #include <iostream>
-#include "board.h"
+#include "controller.h"
+using namespace std;
 
 int main (){
-    Board b;
-
-    b.newBoard();
-
+    Controller control;
 
     int x, y, newx, newy;
 
-    cout << b;
+    control.print(cout);
     
     while(cin >> x >> y >> newx >> newy) {
-        b.makeMove(x,y,newx,newy);
-        cout << b;
+        control.makeMove(x,y,newx,newy);
+        control.print(cout);
     }
     
 }
