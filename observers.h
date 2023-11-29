@@ -2,6 +2,7 @@
 #define OBSERV_H
 #include <iostream>
 #include <vector>
+#include "window.h"
 
 class Square;
 
@@ -25,4 +26,13 @@ public:
 
   friend std::ostream &operator<<(std::ostream &out, const TextDisplay &td);
 };
+
+class GraphicsDisplay: public Observer{
+  Xwindow *window;
+  public:
+    GraphicsDisplay(XWindow *w);
+    void notify(Square &s) override;
+    ~GraphicsDisplay();
+};
+
 #endif
