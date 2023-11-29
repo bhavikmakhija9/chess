@@ -28,7 +28,11 @@ void Controller::makeMove(string initial, string dest, ostream &out)
 
     if (tmp) // checking if there is a piece on that square
     {
-        out << tmp->validMoves.size() << endl;
+        out << tmp->validMoves.size() << "moves" << endl;
+
+        for (auto o :tmp->validMoves) {
+           cout <<o.x << o.y<<endl;
+        }
 
         if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
         {
@@ -95,7 +99,9 @@ void Controller::toggleTurn()
 void Controller::print(std::ostream &out) const { out << *td; }
 
 void Controller::setup(std::istream &in, std::ostream &out)
-{
+{   
+    
+    turn = Colour::White;
     b.emptyBoard();
     string cmd;
     while (in >> cmd)

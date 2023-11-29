@@ -16,7 +16,7 @@ bool ChessPiece::isLegalMove(int newx, int newy, Colour turn)
 
     for (auto n : validMoves)
     {
-        cout << newx << "-"<<n.x<<" "<<newy<<"-"<<n.y<<endl;
+        cout << newx << "-" << n.x << " " << newy << "-" << n.y << endl;
         if (newx == n.x && newy == n.y)
         {
             return true;
@@ -30,47 +30,42 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
     int newx, newy;
-    //cout << "makes call";
+    // cout << "makes call";
 
-    //validMoves.emplace_back(Move{5,0,MoveType::STANDARD}); //delete this later
+    // validMoves.emplace_back(Move{5,0,MoveType::STANDARD}); //delete this later
 
-    // double moves
-    
-    if (!moved)
+    if (getColour() == Colour::White && x == 6)
     {
-        if (getColour() == Colour::White)
+
+        ChessPiece *temp = b.getSquare(x - 1, y)->getPiece();
+        ChessPiece *temp2 = b.getSquare(x - 2, y)->getPiece();
+
+        if (!temp && !temp2)
         {
+            Move doubleMove{x - 2, y, MoveType::STANDARD};
 
-            ChessPiece *temp = b.getSquare(x+1, y)->getPiece();
-            ChessPiece *temp2 = b.getSquare(x+2, y)->getPiece();
-
-            if (!temp && !temp2)
-            {
-                Move doubleMove{x+2, y, MoveType::STANDARD};
-
-                moved = true;
-                validMoves.emplace_back(doubleMove);
-            }
+            moved = true;
+            validMoves.emplace_back(doubleMove);
         }
-        else
+    }
+    else if (x == 1)
+    {
+        ChessPiece *temp = b.getSquare(x + 1, y)->getPiece();
+        ChessPiece *temp2 = b.getSquare(x + 2, y)->getPiece();
+
+        if (!temp && !temp2)
         {
-            ChessPiece *temp = b.getSquare(x-1, y)->getPiece();
-            ChessPiece *temp2 = b.getSquare(x-2, y)->getPiece();
+            Move doubleMove{x + 2, y, MoveType::STANDARD};
 
-            if (!temp && !temp2)
-            {
-                Move doubleMove{x-2, y, MoveType::STANDARD};
-
-                moved = true;
-                validMoves.emplace_back(doubleMove);
-            }
+            moved = true;
+            validMoves.emplace_back(doubleMove);
         }
     }
 
     // normal moves
-    if (getColour() == Colour::White)
+    if (getColour() == Colour::White && x > 0)
     {
-        newx = x-1;
+        newx = x - 1;
         ChessPiece *temp = b.getSquare(newx, y)->getPiece();
 
         if (!temp)
@@ -80,9 +75,9 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
             validMoves.emplace_back(move);
         }
     }
-    else
+    else if (x < b.boardDim - 1)
     {
-        newx = x+1;
+        newx = x + 1;
         ChessPiece *temp = b.getSquare(newx, y)->getPiece();
 
         if (!temp)
@@ -93,41 +88,16 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
         }
     }
 
-    // capturing moves 
-    /*
+    // capturing moves
     if (getColour() == Colour::White)
     {
-        if (x < b.boardDim)
+        if (x < b.boardDim - 1)
         {
-            ChessPiece *temp = b.getSquare(x + 1, y + 1)->getPiece();
+            ChessPiece *temp = b.getSquare(x - 1, y + 1)->getPiece();
 
             if (temp && temp->getColour() == Colour::Black)
-            {
-                Move move{x + 1, y + 1, MoveType::CAPTURING};
-                validMoves.emplace_back(move);
-            }
-        }
-
-        if (x > 0)
-        {
-            ChessPiece *temp2 = b.getSquare(x - 1, y + 1)->getPiece();
-
-            if (temp2 && temp2->getColour() == Colour::Black)
             {
                 Move move{x - 1, y + 1, MoveType::CAPTURING};
-                validMoves.emplace_back(move);
-            }
-        }
-    }
-    else
-    {
-        if (x < b.boardDim)
-        {
-            ChessPiece *temp = b.getSquare(x + 1, y - 1)->getPiece();
-
-            if (temp && temp->getColour() == Colour::Black)
-            {
-                Move move{x + 1, y - 1, MoveType::CAPTURING};
                 validMoves.emplace_back(move);
             }
         }
@@ -143,11 +113,30 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
             }
         }
     }
-    cout<<"current x,y"<< x << "-" << y<< endl <<validMoves.size()<<endl;
-    if(validMoves.size()>0){
-        cout << "valid move:" << validMoves[0].x << "-" << validMoves[0].y<< endl;
-    } */
-    //cout<<"current x,y"<< x << "-" << y<< endl <<validMoves.size()<<endl;
+    else
+    {
+        if (x < b.boardDim - 1)
+        {
+            ChessPiece *temp = b.getSquare(x + 1, y + 1)->getPiece();
+
+            if (temp && temp->getColour() == Colour::Black)
+            {
+                Move move{x + 1, y + 1, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+
+        if (x > 0)
+        {
+            ChessPiece *temp2 = b.getSquare(x + 1, y - 1)->getPiece();
+
+            if (temp2 && temp2->getColour() == Colour::Black)
+            {
+                Move move{x + 1, y - 1, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+    }
 }
 
 PieceType Pawn::getType() { return PieceType::PAWN; }
@@ -171,11 +160,8 @@ void Rook::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
     int newX, newY;
-    
-    //  there is an issue here fs, right moves up and up moves right?? 
-    //  yeah idek lol what is causing this ngl
 
-    // Right moves
+    // Down moves
     newX = x + 1;
     while (newX < b.boardDim)
     {
@@ -195,7 +181,7 @@ void Rook::refreshLegalMoves(int x, int y, Board &b)
         newX++;
     }
 
-    // Left Moves
+    // Up Moves
     newX = x - 1;
     while (newX >= 0)
     {
@@ -215,7 +201,7 @@ void Rook::refreshLegalMoves(int x, int y, Board &b)
         newX--;
     }
 
-    // Up Moves
+    // Right Moves
     newY = y + 1;
     while (newY < b.boardDim)
     {
@@ -235,7 +221,7 @@ void Rook::refreshLegalMoves(int x, int y, Board &b)
         newY++;
     }
 
-    // Down Moves
+    // Left Moves
     newY = y - 1;
     while (newY >= 0)
     {
@@ -272,8 +258,95 @@ Bishop::Bishop(Colour c) : ChessPiece(c){};
 void Bishop::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
-    
-    // 
+    int newX, newY;
+
+    // Up Right Moves
+    newX = x - 1;
+    newY = y + 1;
+    while (newX >= 0 && newY < b.boardDim)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{newX, newY, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{newX, newY, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newX--;
+        newY++;
+    }
+
+    // Down Right Moves
+    newX = x + 1;
+    newY = y + 1;
+    while (newX < b.boardDim && newY < b.boardDim)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{newX, newY, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{newX, newY, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newX++;
+        newY++;
+    }
+
+    // Up Left Moves
+    newX = x - 1;
+    newY = y - 1;
+    while (newX >= 0 && newY >= 0)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{newX, newY, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{newX, newY, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newX--;
+        newY--;
+    }
+
+    // Down Left Moves
+    newX = x + 1;
+    newY = y - 1;
+    while (newX < b.boardDim && newY >= 0)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{newX, newY, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{newX, newY, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newX++;
+        newY--;
+    }
 }
 PieceType Bishop::getType() { return PieceType::BISHOP; }
 char Bishop::getPieceChar()
@@ -292,8 +365,159 @@ King::King(Colour c) : ChessPiece(c), moved(false){};
 void King::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
-    // someone do this
+
+    Colour myColour = getColour();
+
+    if (x > 0)
+    {
+        ChessPiece *up = b.getSquare(x - 1, y)->getPiece(); // moving up the board
+        if (up)
+        {
+            if (up->getColour() != myColour)
+            { // capture move
+                Move move = {x - 1, y, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        { // empty sqaure
+            Move move = {x - 1, y, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    if (x < b.boardDim - 1)
+    {
+
+        ChessPiece *down = b.getSquare(x + 1, y)->getPiece(); // moving down the board
+
+        if (down)
+        {
+            if (down->getColour() != myColour)
+            {
+                Move move = {x + 1, y, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move = {x + 1, y, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    if (y < b.boardDim - 1)
+    {
+        ChessPiece *right = b.getSquare(x, y + 1)->getPiece(); // moving right
+        if (right)
+        {
+            if (right->getColour() != myColour)
+            {
+                Move move = {x, y + 1, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move = {x, y + 1, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    if (y > 0)
+    {
+        ChessPiece *left = b.getSquare(x, y - 1)->getPiece(); // moving left
+
+        if (left)
+        {
+            if (left->getColour() != myColour)
+            {
+                Move move = {x, y - 1, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move = {x, y - 1, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    if (x > 0 && y < b.boardDim - 1)
+    {
+        ChessPiece *topRight = b.getSquare(x - 1, y + 1)->getPiece(); // moving upward diagonal right
+        if (topRight)
+        {
+            if (topRight->getColour() != myColour)
+            {
+                Move move = {x - 1, y + 1, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move = {x - 1, y + 1, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    if (x > 0 && y > 0)
+    {
+        ChessPiece *topLeft = b.getSquare(x - 1, y - 1)->getPiece(); // moving upward diagonal left
+        if (topLeft)
+        {
+            if (topLeft->getColour() != myColour)
+            {
+                Move move = {x - 1, y - 1, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move = {x - 1, y - 1, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    if (x < b.boardDim - 1 && y < b.boardDim - 1)
+    {
+        ChessPiece *bottomRight = b.getSquare(x + 1, y + 1)->getPiece(); // moving downward diagonal right
+
+        if (bottomRight)
+        {
+            if (bottomRight->getColour() != myColour)
+            {
+                Move move = {x + 1, y + 1, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move = {x + 1, y + 1, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    if (x < b.boardDim - 1 && y > 0)
+    {
+        ChessPiece *bottomLeft = b.getSquare(x + 1, y - 1)->getPiece(); // moving downward diagonal left
+
+        if (bottomLeft)
+        {
+            if (bottomLeft->getColour() != myColour)
+            {
+                Move move = {x + 1, y - 1, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move = {x + 1, y - 1, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
 }
+
 PieceType King::getType() { return PieceType::KING; }
 char King::getPieceChar()
 {
@@ -311,7 +535,175 @@ Queen::Queen(Colour c) : ChessPiece(c){};
 void Queen::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
-    // someone do this
+    int newX, newY;
+
+    // Down moves
+    newX = x + 1;
+    while (newX < b.boardDim)
+    {
+        ChessPiece *temp = b.getSquare(newX, y)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{newX, y, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{newX, y, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newX++;
+    }
+
+    // Up Moves
+    newX = x - 1;
+    while (newX >= 0)
+    {
+        ChessPiece *temp = b.getSquare(newX, y)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{newX, y, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{newX, y, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newX--;
+    }
+
+    // Right Moves
+    newY = y + 1;
+    while (newY < b.boardDim)
+    {
+        ChessPiece *temp = b.getSquare(x, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{x, newY, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{x, newY, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newY++;
+    }
+
+    // Left Moves
+    newY = y - 1;
+    while (newY >= 0)
+    {
+        ChessPiece *temp = b.getSquare(x, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{x, newY, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{x, newY, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newY--;
+    }
+
+    // Up Right Moves
+    newX = x - 1;
+    newY = y + 1;
+    while (newX >= 0 && newY < b.boardDim)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{newX, newY, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{newX, newY, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newX--;
+        newY++;
+    }
+
+    // Down Right Moves
+    newX = x + 1;
+    newY = y + 1;
+    while (newX < b.boardDim && newY < b.boardDim)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{newX, newY, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{newX, newY, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newX++;
+        newY++;
+    }
+
+    // Up Left Moves
+    newX = x - 1;
+    newY = y - 1;
+    while (newX >= 0 && newY >= 0)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{newX, newY, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{newX, newY, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newX--;
+        newY--;
+    }
+
+    // Down Left Moves
+    newX = x + 1;
+    newY = y - 1;
+    while (newX < b.boardDim && newY >= 0)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() == getColour())
+            {
+                break;
+            }
+            Move move{newX, newY, MoveType::CAPTURING};
+            validMoves.emplace_back(move);
+            break;
+        }
+        Move move{newX, newY, MoveType::STANDARD};
+        validMoves.emplace_back(move);
+        newX++;
+        newY--;
+    }
 }
 PieceType Queen::getType() { return PieceType::QUEEN; }
 char Queen::getPieceChar()
@@ -330,7 +722,171 @@ Knight::Knight(Colour c) : ChessPiece(c){};
 void Knight::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
-    // do this
+    int newX, newY;
+
+    // Bottom Right
+    newX = x + 2;
+    newY = y + 1;
+    if (newX < b.boardDim && newY < b.boardDim)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() != getColour())
+            {
+                Move move{newX, newY, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move{newX, newY, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    // Bottom Left
+    newY = y - 1;
+    if (newX < b.boardDim && newY >= 0)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() != getColour())
+            {
+                Move move{newX, newY, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move{newX, newY, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    // Top Right
+    newX = x - 2;
+    newY = y + 1;
+    if (newX >= 0 && newY < b.boardDim)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() != getColour())
+            {
+                Move move{newX, newY, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move{newX, newY, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    // Top Left
+    newY = y - 1;
+    if (newX >= 0 && newY >= 0)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() != getColour())
+            {
+                Move move{newX, newY, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move{newX, newY, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    // Upper Right
+    newX = x - 1;
+    newY = y + 2;
+    if (newX >= 0 && newY < b.boardDim)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() != getColour())
+            {
+                Move move{newX, newY, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move{newX, newY, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    // Bottom Right
+    newX = x + 1;
+    if (newX < b.boardDim && newY < b.boardDim)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() != getColour())
+            {
+                Move move{newX, newY, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move{newX, newY, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    // Upper Left
+    newX = x - 1;
+    newY = y - 2;
+    if (newX >= 0 && newY >= 0)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() != getColour())
+            {
+                Move move{newX, newY, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move{newX, newY, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    // Bottom Left
+    newX = x + 1;
+    if (newX < b.boardDim && newY >= 0)
+    {
+        ChessPiece *temp = b.getSquare(newX, newY)->getPiece();
+        if (temp)
+        {
+            if (temp->getColour() != getColour())
+            {
+                Move move{newX, newY, MoveType::CAPTURING};
+                validMoves.emplace_back(move);
+            }
+        }
+        else
+        {
+            Move move{newX, newY, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
 }
 PieceType Knight::getType() { return PieceType::KNIGHT; }
 char Knight::getPieceChar()
