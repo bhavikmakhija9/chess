@@ -35,14 +35,14 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
     //validMoves.emplace_back(Move{5,0,MoveType::STANDARD}); //delete this later
 
     // double moves
-    /*
+    
     if (!moved)
     {
         if (getColour() == Colour::White)
         {
 
-            ChessPiece *temp = b.getSquare(x, y+1)->getPiece();
-            ChessPiece *temp2 = b.getSquare(x, y+2)->getPiece();
+            ChessPiece *temp = b.getSquare(x+1, y)->getPiece();
+            ChessPiece *temp2 = b.getSquare(x+2, y)->getPiece();
 
             if (!temp && !temp2)
             {
@@ -54,8 +54,8 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
         }
         else
         {
-            ChessPiece *temp = b.getSquare(x, y-1)->getPiece();
-            ChessPiece *temp2 = b.getSquare(x, y-2)->getPiece();
+            ChessPiece *temp = b.getSquare(x-1, y)->getPiece();
+            ChessPiece *temp2 = b.getSquare(x-2, y)->getPiece();
 
             if (!temp && !temp2)
             {
@@ -65,7 +65,7 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
                 validMoves.emplace_back(doubleMove);
             }
         }
-    }*/
+    }
 
     // normal moves
     if (getColour() == Colour::White)
