@@ -23,18 +23,17 @@ void Controller::makeMove(string initial, string dest, ostream &out)
     int newRow = translateMove(dest).first;
     int newCol = translateMove(dest).second;
 
-    out << newRow <<newCol<<endl;
     
     ChessPiece *tmp = b.getSquare(row, col)->getPiece();
-    out << tmp->getPieceChar() << endl;
 
     if (tmp) // checking if there is a piece on that square
     {
         out << tmp->validMoves.size() << endl;
-        out << tmp->validMoves[0].x << tmp->validMoves[0].y << endl;
+
         if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
         {
             b.makeMove(row, col, newRow, newCol);
+            b.refreshLegalMoves();
             toggleTurn();
         }
         else
@@ -184,5 +183,6 @@ void Controller::setup(std::istream &in, std::ostream &out)
         }
 
         print(cout);
+        b.refreshLegalMoves();
     }
 }
