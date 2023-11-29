@@ -45,8 +45,8 @@ protected:
 
 public:
     ChessPiece(Colour c);
-    vector<Move> validMoves;  //change this to protected
     bool isLegalMove(int newx, int newy, Colour turn);
+    vector<Move> validMoves;  //change this to protected
     virtual void refreshLegalMoves(int x, int y, Board &b) = 0;
     Colour getColour();
     virtual PieceType getType() = 0;

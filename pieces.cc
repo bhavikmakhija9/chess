@@ -29,21 +29,24 @@ Pawn::Pawn(Colour c) : ChessPiece(c), moved(false){};
 void Pawn::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
+    int newx, newy;
     //cout << "makes call";
 
-    validMoves.emplace_back(Move{5,0,MoveType::STANDARD}); //delete this later
+    //validMoves.emplace_back(Move{5,0,MoveType::STANDARD}); //delete this later
 
     // double moves
+    /*
     if (!moved)
     {
         if (getColour() == Colour::White)
         {
-            ChessPiece *temp = b.getSquare(x, y + 1)->getPiece();
-            ChessPiece *temp2 = b.getSquare(x, y + 2)->getPiece();
+
+            ChessPiece *temp = b.getSquare(x, y+1)->getPiece();
+            ChessPiece *temp2 = b.getSquare(x, y+2)->getPiece();
 
             if (!temp && !temp2)
             {
-                Move doubleMove{x, y + 2, MoveType::STANDARD};
+                Move doubleMove{x+2, y, MoveType::STANDARD};
 
                 moved = true;
                 validMoves.emplace_back(doubleMove);
@@ -51,47 +54,50 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
         }
         else
         {
-            ChessPiece *temp = b.getSquare(x, y - 1)->getPiece();
-            ChessPiece *temp2 = b.getSquare(x, y - 2)->getPiece();
+            ChessPiece *temp = b.getSquare(x, y-1)->getPiece();
+            ChessPiece *temp2 = b.getSquare(x, y-2)->getPiece();
 
             if (!temp && !temp2)
             {
-                Move doubleMove{x, y - 2, MoveType::STANDARD};
+                Move doubleMove{x-2, y, MoveType::STANDARD};
 
                 moved = true;
                 validMoves.emplace_back(doubleMove);
             }
         }
-    }
+    }*/
 
     // normal moves
     if (getColour() == Colour::White)
     {
-        ChessPiece *temp = b.getSquare(x, y + 1)->getPiece();
+        newx = x-1;
+        ChessPiece *temp = b.getSquare(newx, y)->getPiece();
 
         if (!temp)
         {
-            Move move{x, y + 1, MoveType::STANDARD};
+            Move move{newx, y, MoveType::STANDARD};
 
             validMoves.emplace_back(move);
         }
     }
     else
     {
-        ChessPiece *temp = b.getSquare(x, y - 1)->getPiece();
+        newx = x+1;
+        ChessPiece *temp = b.getSquare(newx, y)->getPiece();
 
         if (!temp)
         {
-            Move move{x, y - 1, MoveType::STANDARD};
+            Move move{newx, y, MoveType::STANDARD};
 
             validMoves.emplace_back(move);
         }
     }
 
-    // capturing moves
+    // capturing moves 
+    /*
     if (getColour() == Colour::White)
     {
-        if (x < b.boardDim - 1)
+        if (x < b.boardDim)
         {
             ChessPiece *temp = b.getSquare(x + 1, y + 1)->getPiece();
 
@@ -115,7 +121,7 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
     }
     else
     {
-        if (x < b.boardDim - 1)
+        if (x < b.boardDim)
         {
             ChessPiece *temp = b.getSquare(x + 1, y - 1)->getPiece();
 
@@ -137,6 +143,11 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
             }
         }
     }
+    cout<<"current x,y"<< x << "-" << y<< endl <<validMoves.size()<<endl;
+    if(validMoves.size()>0){
+        cout << "valid move:" << validMoves[0].x << "-" << validMoves[0].y<< endl;
+    } */
+    //cout<<"current x,y"<< x << "-" << y<< endl <<validMoves.size()<<endl;
 }
 
 PieceType Pawn::getType() { return PieceType::PAWN; }
@@ -160,6 +171,9 @@ void Rook::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
     int newX, newY;
+    
+    //  there is an issue here fs, right moves up and up moves right?? 
+    //  yeah idek lol what is causing this ngl
 
     // Right moves
     newX = x + 1;
