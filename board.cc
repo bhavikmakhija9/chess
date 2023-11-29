@@ -5,10 +5,12 @@ using namespace std;
 
 void Square::clearSquare()
 {
-    if (!cp) {
+    if (!cp)
+    {
         delete cp;
     }
     cp = nullptr;
+    notifyAllObservers();
 }
 
 void Square::setCoords(int x, int y)
@@ -31,8 +33,13 @@ bool Square::isEmpty() { return !cp; }
 
 void Square::setPiece(ChessPiece *newCp)
 {
-    delete cp;
+    if (!cp)
+    {
+        delete cp;
+    }
     cp = newCp;
+
+    notifyAllObservers();
 }
 
 ChessPiece *Square::getPiece() { return cp; };
@@ -73,7 +80,17 @@ void Board::setWarFormationRows(int i, Colour c)
     board[i][7].setPiece(new Rook(c));
 }
 
-void Board::newBoard()
+void Board::refreshLegalMoves() {
+    for (int i = 0; i < boardDim; i++) {
+        for (int j = 0; j < boardDim; j++) {
+            if(board[i][j].getPiece()){
+                board[i][j].getPiece()->refreshLegalMoves(i,j,*this);
+            }
+        }
+    }
+}
+
+void Board::defBoard()
 {
     board.resize(boardDim, vector<Square>(boardDim, Square()));
     for (int i = 0; i < boardDim; i++)
@@ -102,15 +119,14 @@ void Board::newBoard()
         for (int j = 0; j < boardDim; j++)
         {
             board[i][j].setCoords(i, j);
-            //board[i][j].attach(td);
         }
     }
 }
 
 void Board::makeMove(int x, int y, int newx, int newy)
 {
-
     board[newx][newy].setPiece(board[x][y].getPiece());
+
     board[x][y].clearSquare();
 
     for (int i = 0; i < boardDim; i++)
@@ -122,16 +138,28 @@ void Board::makeMove(int x, int y, int newx, int newy)
     }
 }
 
-void Board::attachDisplay(Observer* o) {
-    for (int i = 0; i < boardDim; i++) {
-        for (int j = 0; j < boardDim; j++) {
+void Board::attachDisplay(Observer *o)
+{
+    for (int i = 0; i < boardDim; i++)
+    {
+        for (int j = 0; j < boardDim; j++)
+        {
             board[i][j].attach(o);
         }
     }
 }
 
-// std::ostream &operator<<(std::ostream &out, const Board &b)
-// {
-//     out << *(b.td);
-//     return out;
-// }
+Square* Board::getSquare(int x, int y) {
+    return &board[x][y];
+}
+
+void Board::emptyBoard() {
+    for (int i = 0; i < boardDim; i++)
+    {      for (int j = 0; j < boardDim; j++)
+        {
+            board[i][j].clearSquare();
+        }
+    }
+
+}
+

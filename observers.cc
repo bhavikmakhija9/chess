@@ -44,12 +44,14 @@ TextDisplay::~TextDisplay() {}
 ostream &operator<<(ostream &out, const TextDisplay &td)
 {
     for (int i = 0; i < 8; ++i)
-    {
+    {   out << 8 - i<< " ";
         for (int j = 0; j < 8; ++j)
         {
             out << td.theDisplay[i][j];
         }
         out << endl;
     }
+    out << "\n";
+    out << "  " <<"abcdefgh" << endl;
     return out;
 }

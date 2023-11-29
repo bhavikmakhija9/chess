@@ -3,16 +3,34 @@
 #include "controller.h"
 using namespace std;
 
-int main (){
+int main()
+{
     Controller control;
 
-    int x, y, newx, newy;
+    string cmd, initial, dest;
 
     control.print(cout);
-    
-    while(cin >> x >> y >> newx >> newy) {
-        control.makeMove(x,y,newx,newy);
-        control.print(cout);
+
+    while (cin >> cmd)
+    {
+
+        if (cmd == "game")
+        {
+        }
+
+        else if (cmd == "move")
+        {
+            cin >> initial >> dest;
+            control.makeMove(initial, dest, cout);
+            control.print(cout);
+        }
+
+        else if (cmd == "setup") {
+           control.setup(cin, cout);
+        }
+
+        else {
+            cout << "Invalid Command. Try Again" << endl;
+        } 
     }
-    
 }

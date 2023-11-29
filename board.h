@@ -1,3 +1,5 @@
+#ifndef BOARD_H
+#define BOARD_H
 #include <vector>
 #include <iostream>
 #include "pieces.h"
@@ -8,7 +10,7 @@ class Square
 {
     ChessPiece *cp = nullptr;
     int x, y;
-    vector<Observer*> observers;
+    vector<Observer *> observers;
 
 public:
     bool isEmpty();
@@ -18,22 +20,23 @@ public:
     int getX();
     int getY();
     ChessPiece *getPiece();
-    void attach(Observer* o);
+    void attach(Observer *o);
     void notifyAllObservers();
 };
 
 class Board
 {
-    const int boardDim = 8;
     vector<vector<Square>> board;
     void setWarFormationRows(int i, Colour c);
-    //TextDisplay *td;
 public:
+    const int boardDim = 8;
     Board();
     void clearBoard();
-    void newBoard();
+    void refreshLegalMoves();
+    void defBoard();
     void makeMove(int x, int y, int newx, int newy);
-    void attachDisplay(Observer* o);
-
-    //friend std::ostream &operator<<(std::ostream &out, const Board &b);
+    void attachDisplay(Observer *o);
+    void emptyBoard();
+    Square *getSquare(int x, int y);
 };
+#endif

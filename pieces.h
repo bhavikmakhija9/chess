@@ -1,5 +1,8 @@
+#ifndef PIECES_H
+#define PIECES_H
 #include <iostream>
 #include <stdlib.h>
+#include <vector>
 
 class Board;
 
@@ -21,13 +24,30 @@ enum PieceType
     KING
 };
 
+enum MoveType
+{
+    STANDARD,
+    DEFENSE,
+    CAPTURING,
+    CHECKING
+};
+
+struct Move
+{
+    int x, y;
+    MoveType type;
+};
+
 class ChessPiece
 {
-    Colour c;
+protected:
+    Colour c; 
 
 public:
     ChessPiece(Colour c);
-    virtual bool isLegalMove(int x, int y, int newx, int newy, Board &b) = 0;
+    vector<Move> validMoves;  //change this to protected
+    bool isLegalMove(int newx, int newy, Colour turn);
+    virtual void refreshLegalMoves(int x, int y, Board &b) = 0;
     Colour getColour();
     virtual PieceType getType() = 0;
     virtual char getPieceChar() = 0;
@@ -41,7 +61,7 @@ class Pawn : public ChessPiece
 public:
     Pawn(Colour c);
     PieceType getType() override;
-    bool isLegalMove(int x, int y, int newx, int newy, Board &b) override;
+    void refreshLegalMoves(int x, int y, Board &b) override;
     char getPieceChar() override;
 };
 
@@ -52,8 +72,8 @@ class Rook : public ChessPiece
 public:
     Rook(Colour c);
     PieceType getType() override;
-    bool isLegalMove(int x, int y, int newx, int newy, Board &b) override;
-     char getPieceChar() override;
+    void refreshLegalMoves(int x, int y, Board &b) override;
+    char getPieceChar() override;
 };
 
 class Bishop : public ChessPiece
@@ -61,8 +81,8 @@ class Bishop : public ChessPiece
 public:
     Bishop(Colour c);
     PieceType getType() override;
-    bool isLegalMove(int x, int y, int newx, int newy, Board &b) override;
-     char getPieceChar() override;
+    void refreshLegalMoves(int x, int y, Board &b) override;
+    char getPieceChar() override;
 };
 
 class King : public ChessPiece
@@ -72,8 +92,8 @@ class King : public ChessPiece
 public:
     King(Colour c);
     PieceType getType() override;
-    bool isLegalMove(int x, int y, int newx, int newy, Board &b) override;
-     char getPieceChar() override;
+    void refreshLegalMoves(int x, int y, Board &b) override;
+    char getPieceChar() override;
 };
 
 class Queen : public ChessPiece
@@ -81,8 +101,8 @@ class Queen : public ChessPiece
 public:
     Queen(Colour c);
     PieceType getType() override;
-    bool isLegalMove(int x, int y, int newx, int newy, Board &b) override;
-     char getPieceChar() override;
+    void refreshLegalMoves(int x, int y, Board &b) override;
+    char getPieceChar() override;
 };
 
 class Knight : public ChessPiece
@@ -90,6 +110,7 @@ class Knight : public ChessPiece
 public:
     Knight(Colour c);
     PieceType getType() override;
-    bool isLegalMove(int x, int y, int newx, int newy, Board &b) override;
+    void refreshLegalMoves(int x, int y, Board &b) override;
     char getPieceChar() override;
 };
+#endif
