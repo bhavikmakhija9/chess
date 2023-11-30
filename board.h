@@ -41,6 +41,7 @@ public:
     Board(const Board &other);
     void clearBoard();
     void refreshLegalMoves();
+    void refreshTempLegalMoves();
     void defBoard();
     void makeMove(int x, int y, int newx, int newy);
     void attachDisplay(Observer *o);

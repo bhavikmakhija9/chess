@@ -156,6 +156,19 @@ void Board::refreshLegalMoves()
     }
 }
 
+void Board::refreshTempLegalMoves() {
+    for (int i = 0; i < boardDim; i++)
+    {
+        for (int j = 0; j < boardDim; j++)
+        {
+            if (board[i][j].getPiece())
+            {
+                board[i][j].getPiece()->refreshLegalMoves(i, j, *this);
+            }
+        }
+    }
+}
+
 void Board::defBoard()
 {
     Colour col = White;
@@ -254,7 +267,7 @@ bool Board::isChecked(Colour c)
                 {
                     if (n.type == CHECKING && board[i][j].getPiece()->getColour() != c)
                     {
-                        cout << board[i][j].getPiece()->getPieceChar() << " checked " << c << endl;
+                        cout << board[i][j].getPiece()->getPieceChar() << " checked " << c << " with move " << n.x << ", " << n.y << endl;
                         return true;
                     }
                 }

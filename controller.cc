@@ -5,7 +5,7 @@ using namespace std;
 Controller::Controller() : td(new TextDisplay), turn(White)
 {
     b.defBoard();
-    b.refreshLegalMoves();
+    b.refreshTempLegalMoves();
     b.attachDisplay(td);
 }
 
