@@ -23,10 +23,11 @@ public:
     int getX();
     int getY();
     Colour getColour();
-    void setColour(Colour c);
+    void setColour(Colour col);
     ChessPiece *getPiece();
     void attach(Observer *o);
     void notifyAllObservers();
+    ~Square();
 };
 
 class Board
@@ -37,6 +38,7 @@ class Board
 public:
     const int boardDim = 8;
     Board();
+    Board(const Board &other);
     void clearBoard();
     void refreshLegalMoves();
     void defBoard();
@@ -44,5 +46,6 @@ public:
     void attachDisplay(Observer *o);
     void emptyBoard();
     Square *getSquare(int x, int y);
+    bool isChecked(Colour c);
 };
 #endif

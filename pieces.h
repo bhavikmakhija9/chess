@@ -29,8 +29,7 @@ enum MoveType
     STANDARD,
     DEFENSE,
     CAPTURING,
-    CHECKING,
-    PROMOTION
+    CHECKING
 };
 
 struct Move
@@ -48,7 +47,9 @@ protected:
 public:
     ChessPiece(Colour c);
     bool isLegalMove(int newx, int newy, Colour turn);
+    bool resultsInCheck(int x, int y, Move m, Board b);
     vector<Move> *getValidMoves();
+    void filterValidMoves(int x, int y, Board &b);
     virtual void refreshLegalMoves(int x, int y, Board &b) = 0;
     Colour getColour();
     virtual PieceType getType() = 0;

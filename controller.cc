@@ -22,8 +22,8 @@ void Controller::makeMove(string initial, string dest, ostream &out)
     int col = translateMove(initial).second;
     int newRow = translateMove(dest).first;
     int newCol = translateMove(dest).second;
+    b.refreshLegalMoves();//maybe
 
-    
     ChessPiece *tmp = b.getSquare(row, col)->getPiece();
 
     if (tmp) // checking if there is a piece on that square
@@ -44,7 +44,7 @@ void Controller::makeMove(string initial, string dest, ostream &out)
     {
         out << "No Piece there" << endl;
     }
-
+    checkForCheck(out);
 }
 
 ChessPiece *Controller::translate(char c)
@@ -95,8 +95,8 @@ void Controller::toggleTurn()
 void Controller::print(std::ostream &out) const { out << *td; }
 
 void Controller::setup(std::istream &in, std::ostream &out)
-{   
-    
+{
+
     turn = Colour::White;
     b.emptyBoard();
     string cmd;
@@ -189,12 +189,15 @@ void Controller::setup(std::istream &in, std::ostream &out)
     }
 }
 
-// void Controller::checkForCheck(ostream &out) {
-//     if(b.isChecked(Black)) {
-//         out << "Black is in check" << endl;
-//     }
+void Controller::checkForCheck(ostream &out)
+{
+    if (b.isChecked(Black))
+    {
+        out << "Black is in check" << endl;
+    }
 
-//     if(b.isChecked(White)) {
-//         out << "White is in check" << endl;
-//     }
-// }
+    if (b.isChecked(White))
+    {
+        out << "White is in check" << endl;
+    }
+}

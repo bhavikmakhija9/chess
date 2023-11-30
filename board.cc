@@ -5,7 +5,8 @@ using namespace std;
 
 Square::Square() : x{0}, y{0} {};
 
-Square::Square(const Square &other) {
+Square::Square(const Square &other)
+{
     x = other.x;
     y = other.y;
     c = other.c;
@@ -68,16 +69,16 @@ Colour Square::getColour()
     return c;
 }
 
-void Square::setColour(Colour colour)
+void Square::setColour(Colour col)
 {
-    c = colour;
+    c = col;
 }
 
 bool Square::isEmpty() { return !cp; }
 
 void Square::setPiece(ChessPiece *newCp)
 {
-    if (!cp)
+    if (cp)
     {
         delete cp;
     }
@@ -98,7 +99,17 @@ void Square::notifyAllObservers()
     }
 }
 
+Square::~Square()
+{
+    if (cp)
+    {
+        delete cp;
+    }
+}
+
 Board::Board() {}
+
+Board::Board(const Board &other) { board = other.board; }
 
 void Board::clearBoard()
 {
@@ -132,7 +143,7 @@ void Board::refreshLegalMoves()
         {
             if (board[i][j].getPiece())
             {
-                board[i][j].getPiece()->refreshLegalMoves(i, j, *this);
+                board[i][j].getPiece()->filterValidMoves(i, j, *this);
             }
         }
     }
@@ -221,4 +232,26 @@ void Board::emptyBoard()
             board[i][j].clearSquare();
         }
     }
+}
+
+bool Board::isChecked(Colour c)
+{
+    for (int i = 0; i < boardDim; i++)
+    {
+        for (int j = 0; j < boardDim; j++)
+        {
+            if (board[i][j].getPiece())
+            {
+                vector<Move> *ptr = board[i][j].getPiece()->getValidMoves();
+                for (auto n : *ptr)
+                {
+                    if (n.type == CHECKING && board[i][j].getPiece()->getColour() != c)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }

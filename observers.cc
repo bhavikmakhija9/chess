@@ -15,13 +15,13 @@ TextDisplay::TextDisplay()
         {
             theDisplay[i][j] = curr;
 
-            if (curr == ' ')
+            if (curr == '_')//change after
             {
-                curr = '_';
+                curr = ' ';
             }
             else
             {
-                curr = ' ';
+                curr = '_';
             }
         }
     }
@@ -64,7 +64,7 @@ void TextDisplay::notify(Square &s)
         }
         else if (s.getColour() == Colour::White)
         {
-            theDisplay[x][y] = ' ';
+            theDisplay[x][y] = ' '; //change after
         }
     }
 
