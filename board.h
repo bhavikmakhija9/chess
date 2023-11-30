@@ -11,14 +11,19 @@ class Square
     ChessPiece *cp = nullptr;
     int x, y;
     vector<Observer *> observers;
+    Colour c;
 
 public:
+    Square();
+    Square(const Square &other);
     bool isEmpty();
     void setPiece(ChessPiece *newCp);
     void clearSquare();
     void setCoords(int x, int y);
     int getX();
     int getY();
+    Colour getColour();
+    void setColour(Colour c);
     ChessPiece *getPiece();
     void attach(Observer *o);
     void notifyAllObservers();
@@ -28,6 +33,7 @@ class Board
 {
     vector<vector<Square>> board;
     void setWarFormationRows(int i, Colour c);
+
 public:
     const int boardDim = 8;
     Board();

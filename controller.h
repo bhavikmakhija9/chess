@@ -13,6 +13,7 @@ class Controller
     Colour turn;
     std::pair<int, int> translateMove(string str); //translates move from chess board notation to grid notation
     void toggleTurn();
+    void checkForCheck(std::ostream &out);
 
 public:
     Controller();

@@ -3,6 +3,40 @@
 #include <utility>
 using namespace std;
 
+Square::Square() : x{0}, y{0} {};
+
+Square::Square(const Square &other) {
+    x = other.x;
+    y = other.y;
+    c = other.c;
+    if (cp)
+    {
+        delete cp;
+    }
+    if (other.cp)
+    {
+        switch (other.cp->getType())
+        {
+        case PAWN:
+            cp = new Pawn(*(static_cast<Pawn *>(other.cp)));
+        case ROOK:
+            cp = new Rook(*(static_cast<Rook *>(other.cp)));
+        case BISHOP:
+            cp = new Bishop(*(static_cast<Bishop *>(other.cp)));
+        case QUEEN:
+            cp = new Queen(*(static_cast<Queen *>(other.cp)));
+        case KNIGHT:
+            cp = new Knight(*(static_cast<Knight *>(other.cp)));
+        case KING:
+            cp = new King(*(static_cast<King *>(other.cp)));
+        }
+    }
+    else
+    {
+        cp = nullptr;
+    }
+}
+
 void Square::clearSquare()
 {
     if (!cp)
@@ -27,6 +61,16 @@ int Square::getX()
 int Square::getY()
 {
     return y;
+}
+
+Colour Square::getColour()
+{
+    return c;
+}
+
+void Square::setColour(Colour colour)
+{
+    c = colour;
 }
 
 bool Square::isEmpty() { return !cp; }
@@ -80,11 +124,15 @@ void Board::setWarFormationRows(int i, Colour c)
     board[i][7].setPiece(new Rook(c));
 }
 
-void Board::refreshLegalMoves() {
-    for (int i = 0; i < boardDim; i++) {
-        for (int j = 0; j < boardDim; j++) {
-            if(board[i][j].getPiece()){
-                board[i][j].getPiece()->refreshLegalMoves(i,j,*this);
+void Board::refreshLegalMoves()
+{
+    for (int i = 0; i < boardDim; i++)
+    {
+        for (int j = 0; j < boardDim; j++)
+        {
+            if (board[i][j].getPiece())
+            {
+                board[i][j].getPiece()->refreshLegalMoves(i, j, *this);
             }
         }
     }
@@ -92,6 +140,7 @@ void Board::refreshLegalMoves() {
 
 void Board::defBoard()
 {
+    Colour col = White;
     board.resize(boardDim, vector<Square>(boardDim, Square()));
     for (int i = 0; i < boardDim; i++)
     {
@@ -119,6 +168,15 @@ void Board::defBoard()
         for (int j = 0; j < boardDim; j++)
         {
             board[i][j].setCoords(i, j);
+            board[i][j].setColour(col);
+            if (col == Colour::White)
+            {
+                col = Colour::Black;
+            }
+            else
+            {
+                col = Colour::White;
+            }
         }
     }
 }
@@ -149,17 +207,18 @@ void Board::attachDisplay(Observer *o)
     }
 }
 
-Square* Board::getSquare(int x, int y) {
+Square *Board::getSquare(int x, int y)
+{
     return &board[x][y];
 }
 
-void Board::emptyBoard() {
+void Board::emptyBoard()
+{
     for (int i = 0; i < boardDim; i++)
-    {      for (int j = 0; j < boardDim; j++)
+    {
+        for (int j = 0; j < boardDim; j++)
         {
             board[i][j].clearSquare();
         }
     }
-
 }
-

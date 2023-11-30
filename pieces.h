@@ -10,7 +10,7 @@ using namespace std;
 
 enum Colour
 {
-    White = 0,
+    White,
     Black
 };
 
@@ -29,7 +29,8 @@ enum MoveType
     STANDARD,
     DEFENSE,
     CAPTURING,
-    CHECKING
+    CHECKING,
+    PROMOTION
 };
 
 struct Move
@@ -41,12 +42,13 @@ struct Move
 class ChessPiece
 {
 protected:
-    Colour c; 
+    Colour c;
+    vector<Move> validMoves; // change this to protected
 
 public:
     ChessPiece(Colour c);
     bool isLegalMove(int newx, int newy, Colour turn);
-    vector<Move> validMoves;  //change this to protected
+    vector<Move> *getValidMoves();
     virtual void refreshLegalMoves(int x, int y, Board &b) = 0;
     Colour getColour();
     virtual PieceType getType() = 0;

@@ -28,11 +28,6 @@ void Controller::makeMove(string initial, string dest, ostream &out)
 
     if (tmp) // checking if there is a piece on that square
     {
-        out << tmp->validMoves.size() << "moves" << endl;
-
-        for (auto o :tmp->validMoves) {
-           cout <<o.x << o.y<<endl;
-        }
 
         if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
         {
@@ -49,6 +44,7 @@ void Controller::makeMove(string initial, string dest, ostream &out)
     {
         out << "No Piece there" << endl;
     }
+
 }
 
 ChessPiece *Controller::translate(char c)
@@ -192,3 +188,13 @@ void Controller::setup(std::istream &in, std::ostream &out)
         b.refreshLegalMoves();
     }
 }
+
+// void Controller::checkForCheck(ostream &out) {
+//     if(b.isChecked(Black)) {
+//         out << "Black is in check" << endl;
+//     }
+
+//     if(b.isChecked(White)) {
+//         out << "White is in check" << endl;
+//     }
+// }
