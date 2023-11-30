@@ -22,7 +22,7 @@ void Controller::makeMove(string initial, string dest, ostream &out)
     int col = translateMove(initial).second;
     int newRow = translateMove(dest).first;
     int newCol = translateMove(dest).second;
-    b.refreshLegalMoves();//maybe
+    b.refreshLegalMoves();
 
     ChessPiece *tmp = b.getSquare(row, col)->getPiece();
 

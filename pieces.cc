@@ -36,6 +36,17 @@ void ChessPiece::filterValidMoves(int x, int y, Board& b)
 bool ChessPiece::resultsInCheck(int x, int y, Move m, Board boa)
 {
     boa.makeMove(x, y, m.x, m.y);
+    // for (int i = 0; i < 8; ++i) {
+    //     for (int j = 0; j < 8; ++j) {
+    //         if (boa.getSquare(i,j)->getPiece()) {
+    //             //boa.getSquare(i,j)->getPiece()->refreshLegalMoves(i, j, boa);
+    //             //cout << boa.getSquare(i,j)->getPiece()->getPieceChar();
+    //         } else {
+    //             //cout << "*";
+    //         }
+    //     }
+    //     //cout << endl;
+    // }
     cout << getPieceChar() << " " << m.x << " " << m.y <<"' " << boa.isChecked(getColour()) << endl;
     return boa.isChecked(getColour());
 }

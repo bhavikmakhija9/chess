@@ -20,16 +20,23 @@ Square::Square(const Square &other)
         {
         case PAWN:
             cp = new Pawn(*(static_cast<Pawn *>(other.cp)));
+            break;
         case ROOK:
             cp = new Rook(*(static_cast<Rook *>(other.cp)));
+            break;
         case BISHOP:
             cp = new Bishop(*(static_cast<Bishop *>(other.cp)));
+            break;
         case QUEEN:
             cp = new Queen(*(static_cast<Queen *>(other.cp)));
+            break;
         case KNIGHT:
             cp = new Knight(*(static_cast<Knight *>(other.cp)));
+            break;
         case KING:
             cp = new King(*(static_cast<King *>(other.cp)));
+            break;
+        default: break;
         }
     }
     else
@@ -247,6 +254,7 @@ bool Board::isChecked(Colour c)
                 {
                     if (n.type == CHECKING && board[i][j].getPiece()->getColour() != c)
                     {
+                        cout << board[i][j].getPiece()->getPieceChar() << " checked " << c << endl;
                         return true;
                     }
                 }
