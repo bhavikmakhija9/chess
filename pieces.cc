@@ -24,7 +24,7 @@ void ChessPiece::filterValidMoves(int x, int y, Board& b)
 
     validMoves.clear();
 
-    for (auto n : validMoves) {
+    for (auto n : temp) {
         cout << "valid moves: "<< getPieceChar() << n.x << n.y <<endl;
 
     }
@@ -64,7 +64,7 @@ Pawn::Pawn(Colour c) : ChessPiece(c), moved(false){};
 void Pawn::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
-    int newx,newy;
+    int newx;
     // cout << "makes call";
 
     // validMoves.emplace_back(Move{5,0,MoveType::STANDARD}); //delete this later
@@ -341,7 +341,7 @@ void Bishop::refreshLegalMoves(int x, int y, Board &b)
             Move move{newX, newY, MoveType::CAPTURING};
             if (temp->getType() == KING && temp->getColour() != getColour())
             {
-                move = {newX, y, MoveType::CHECKING};
+                move = {newX, newY, MoveType::CHECKING};
             }
             validMoves.emplace_back(move);
             break;
@@ -367,7 +367,7 @@ void Bishop::refreshLegalMoves(int x, int y, Board &b)
             Move move{newX, newY, MoveType::CAPTURING};
             if (temp->getType() == KING && temp->getColour() != getColour())
             {
-                move = {newX, y, MoveType::CHECKING};
+                move = {newX, newY, MoveType::CHECKING};
             }
             validMoves.emplace_back(move);
             break;
@@ -393,7 +393,7 @@ void Bishop::refreshLegalMoves(int x, int y, Board &b)
             Move move{newX, newY, MoveType::CAPTURING};
             if (temp->getType() == KING && temp->getColour() != getColour())
             {
-                move = {newX, y, MoveType::CHECKING};
+                move = {newX, newY, MoveType::CHECKING};
             }
             validMoves.emplace_back(move);
             break;
@@ -419,7 +419,7 @@ void Bishop::refreshLegalMoves(int x, int y, Board &b)
             Move move{newX, newY, MoveType::CAPTURING};
             if (temp->getType() == KING && temp->getColour() != getColour())
             {
-                move = {newX, y, MoveType::CHECKING};
+                move = {newX, newY, MoveType::CHECKING};
             }
             validMoves.emplace_back(move);
             break;
@@ -718,7 +718,7 @@ void Queen::refreshLegalMoves(int x, int y, Board &b)
             Move move{newX, newY, MoveType::CAPTURING};
             if (temp->getType() == KING && temp->getColour() != getColour())
             {
-                move = {newX, y, MoveType::CHECKING};
+                move = {newX, newY, MoveType::CHECKING};
             }
             validMoves.emplace_back(move);
             break;
@@ -744,7 +744,7 @@ void Queen::refreshLegalMoves(int x, int y, Board &b)
             Move move{newX, newY, MoveType::CAPTURING};
             if (temp->getType() == KING && temp->getColour() != getColour())
             {
-                move = {newX, y, MoveType::CHECKING};
+                move = {newX, newY, MoveType::CHECKING};
             }
             validMoves.emplace_back(move);
             break;
@@ -770,7 +770,7 @@ void Queen::refreshLegalMoves(int x, int y, Board &b)
             Move move{newX, newY, MoveType::CAPTURING};
             if (temp->getType() == KING && temp->getColour() != getColour())
             {
-                move = {newX, y, MoveType::CHECKING};
+                move = {newX, newY, MoveType::CHECKING};
             }
             validMoves.emplace_back(move);
             break;
@@ -796,7 +796,7 @@ void Queen::refreshLegalMoves(int x, int y, Board &b)
             Move move{newX, newY, MoveType::CAPTURING};
             if (temp->getType() == KING && temp->getColour() != getColour())
             {
-                move = {newX, y, MoveType::CHECKING};
+                move = {newX, newY, MoveType::CHECKING};
             }
             validMoves.emplace_back(move);
             break;
