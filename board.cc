@@ -262,7 +262,6 @@ bool Board::isChecked(Colour c)
                 {
                     if (n.type == CHECKING && board[i][j].getPiece()->getColour() != c)
                     {
-                        cout << board[i][j].getPiece()->getPieceChar() << " checked " << c << endl;
                         return true;
                     }
                 }

@@ -8,6 +8,14 @@ ChessPiece::ChessPiece(Colour c) : mycolour(c){};
 
 Colour ChessPiece::getColour() { return mycolour; }
 
+void ChessPiece::deleteMove(int newx, int newy){
+    for(int i = 0; i < validMoves.size(); ++i){
+        if (validMoves.at(i).x == newx && validMoves.at(i).y==newy){
+            validMoves.erase(validMoves.begin() + i);
+        }
+    }
+}
+
 vector<Move> *ChessPiece::getValidMoves() { return &validMoves; };
 
 void ChessPiece::filterValidMoves(int x, int y, Board &b)
@@ -125,7 +133,7 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
     // capturing moves
     if (getColour() == Colour::White)
     {
-        if (x < b.boardDim - 1)
+        if (x > 0 && y < b.boardDim-1)
         {
             ChessPiece *temp = b.getSquare(x - 1, y + 1)->getPiece();
 
@@ -140,7 +148,7 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
             }
         }
 
-        if (x > 0)
+        if (x > 0 && y > 0)
         {
             ChessPiece *temp2 = b.getSquare(x - 1, y - 1)->getPiece();
 
@@ -157,11 +165,11 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
     }
     else
     {
-        if (x < b.boardDim - 1)
+        if (x < b.boardDim - 1 && y < b.boardDim - 1)
         {
             ChessPiece *temp = b.getSquare(x + 1, y + 1)->getPiece();
 
-            if (temp && temp->getColour() == Colour::Black)
+            if (temp && temp->getColour() == Colour::White)
             {
                 Move move{x + 1, y + 1, MoveType::CAPTURING};
                 if (temp->getType() == KING && temp->getColour() != getColour())
@@ -172,11 +180,11 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
             }
         }
 
-        if (x > 0)
+        if (x < b.boardDim - 1 && y > 0)
         {
             ChessPiece *temp2 = b.getSquare(x + 1, y - 1)->getPiece();
 
-            if (temp2 && temp2->getColour() == Colour::Black)
+            if (temp2 && temp2->getColour() == Colour::White)
             {
                 Move move{x + 1, y - 1, MoveType::CAPTURING};
                 if (temp2->getType() == KING && temp2->getColour() != getColour())
@@ -655,6 +663,10 @@ void Queen::refreshLegalMoves(int x, int y, Board &b)
                 break;
             }
             Move move{newX, y, MoveType::CAPTURING};
+            if (temp->getType() == KING && temp->getColour() != getColour())
+            {
+                move = {newX, y, MoveType::CHECKING};
+            }
             validMoves.emplace_back(move);
             break;
         }
@@ -675,6 +687,10 @@ void Queen::refreshLegalMoves(int x, int y, Board &b)
                 break;
             }
             Move move{x, newY, MoveType::CAPTURING};
+            if (temp->getType() == KING && temp->getColour() != getColour())
+            {
+                move = {newX, y, MoveType::CHECKING};
+            }
             validMoves.emplace_back(move);
             break;
         }
@@ -695,6 +711,10 @@ void Queen::refreshLegalMoves(int x, int y, Board &b)
                 break;
             }
             Move move{x, newY, MoveType::CAPTURING};
+            if (temp->getType() == KING && temp->getColour() != getColour())
+            {
+                move = {newX, y, MoveType::CHECKING};
+            }
             validMoves.emplace_back(move);
             break;
         }
