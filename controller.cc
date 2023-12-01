@@ -2,6 +2,9 @@
 
 using namespace std;
 
+void Controller::setBoard(Board newB) {
+    b = newB;
+}
 Controller::Controller() : td(new TextDisplay), turn(White)
 {
     b.defBoard();
@@ -28,11 +31,33 @@ void Controller::makeMove(string initial, string dest, ostream &out)
 
     if (tmp) // checking if there is a piece on that square
     {
-
+        ChessPiece* dest = nullptr;
+        if (b.getSquare(newRow, newCol)->getPiece()) {
+            if (b.getSquare(newRow, newCol)->getPiece()->getType() == PAWN) {
+                dest = new Pawn(*(static_cast<Pawn*>(b.getSquare(newRow, newCol)->getPiece())));
+            } else if (b.getSquare(newRow, newCol)->getPiece()->getType() == ROOK) {
+                dest = new Rook(*(static_cast<Rook*>(b.getSquare(newRow, newCol)->getPiece())));
+            } else if (b.getSquare(newRow, newCol)->getPiece()->getType() == BISHOP) {
+                dest = new Bishop(*(static_cast<Bishop*>(b.getSquare(newRow, newCol)->getPiece())));
+            } else if (b.getSquare(newRow, newCol)->getPiece()->getType() == KING) {
+                dest = new King(*(static_cast<King*>(b.getSquare(newRow, newCol)->getPiece())));
+            } else if (b.getSquare(newRow, newCol)->getPiece()->getType() == QUEEN) {
+                dest = new Queen(*(static_cast<Queen*>(b.getSquare(newRow, newCol)->getPiece())));
+            } else if (b.getSquare(newRow, newCol)->getPiece()->getType() == KNIGHT) {
+                dest = new Knight(*(static_cast<Knight*>(b.getSquare(newRow, newCol)->getPiece())));
+            } 
+        }
         if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
         {
             b.makeMove(row, col, newRow, newCol);
             b.refreshLegalMoves();
+            
+            if(b.isChecked(turn)) {
+                b.getSquare(newRow, newCol)->setPiece(dest);
+                b.getSquare(row,col)->setPiece(tmp);
+                out << "Puts you in check"<< endl;
+                toggleTurn();
+            }
             toggleTurn();
         }
         else
@@ -201,3 +226,20 @@ void Controller::checkForCheck(ostream &out)
         out << "White is in check" << endl;
     }
 }
+
+    void Controller::makeMove(int x, int y, int newx, int newY) {
+     b.refreshLegalMoves();
+
+    ChessPiece *tmp = b.getSquare(x, y)->getPiece();
+
+    if (tmp) // checking if there is a piece on that square
+    {
+
+        if (tmp->isLegalMove(newx, newY, turn)) // checking if the move is legal
+        {
+            b.makeMove(x, y, newx, newY);
+            b.refreshLegalMoves();
+            toggleTurn();
+        }
+    }
+    }

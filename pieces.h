@@ -41,7 +41,7 @@ struct Move
 class ChessPiece
 {
 protected:
-    Colour c;
+    Colour mycolour;
     vector<Move> validMoves; // change this to protected
 
 public:

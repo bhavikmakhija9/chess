@@ -11,7 +11,7 @@ class Square
     ChessPiece *cp = nullptr;
     int x, y;
     vector<Observer *> observers;
-    Colour c;
+    Colour myC;
 
 public:
     Square();
@@ -39,6 +39,7 @@ public:
     const int boardDim = 8;
     Board();
     Board(const Board &other);
+    Board& operator=(const Board &other);
     void clearBoard();
     void refreshLegalMoves();
     void defBoard();

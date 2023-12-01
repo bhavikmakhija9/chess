@@ -9,7 +9,7 @@ Square::Square(const Square &other)
 {
     x = other.x;
     y = other.y;
-    c = other.c;
+    myC = other.myC;
     if (cp)
     {
         delete cp;
@@ -36,7 +36,8 @@ Square::Square(const Square &other)
         case KING:
             cp = new King(*(static_cast<King *>(other.cp)));
             break;
-        default: break;
+        default:
+            break;
         }
     }
     else
@@ -47,7 +48,7 @@ Square::Square(const Square &other)
 
 void Square::clearSquare()
 {
-    if (!cp)
+    if (cp)
     {
         delete cp;
     }
@@ -73,22 +74,22 @@ int Square::getY()
 
 Colour Square::getColour()
 {
-    return c;
+    return myC;
 }
 
 void Square::setColour(Colour col)
 {
-    c = col;
+    myC = col;
 }
 
 bool Square::isEmpty() { return !cp; }
 
 void Square::setPiece(ChessPiece *newCp)
 {
-    if (cp)
-    {
-        delete cp;
-    }
+    // if (cp)
+    // {
+    //     delete cp;
+    // }
     cp = newCp;
 
     notifyAllObservers();
@@ -116,7 +117,13 @@ Square::~Square()
 
 Board::Board() {}
 
-Board::Board(const Board &other) { board = other.board; }
+Board &Board::operator=(const Board &other)
+{
+    board = other.board;
+    return *this;
+}
+
+Board ::Board(const Board &other) { board = other.board; }
 
 void Board::clearBoard()
 {
@@ -150,7 +157,7 @@ void Board::refreshLegalMoves()
         {
             if (board[i][j].getPiece())
             {
-                board[i][j].getPiece()->filterValidMoves(i, j, *this);
+                board[i][j].getPiece()->refreshLegalMoves(i, j, *this);
             }
         }
     }
@@ -202,6 +209,7 @@ void Board::defBoard()
 void Board::makeMove(int x, int y, int newx, int newy)
 {
     board[newx][newy].setPiece(board[x][y].getPiece());
+    board[x][y].setPiece(nullptr);
 
     board[x][y].clearSquare();
 

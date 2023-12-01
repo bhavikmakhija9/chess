@@ -18,7 +18,9 @@ class Controller
 public:
     Controller();
     void makeMove(string initial, string dest, std::ostream &out);
+    void makeMove(int x, int y, int newx, int newY);
     void print(std::ostream &out) const;
     void setup(std::istream &in, std::ostream &out);
+    void setBoard(Board b);
 };
 #endif

@@ -1,22 +1,23 @@
 #include "pieces.h"
 #include "board.h"
+#include "controller.h"
 #include <vector>
 using namespace std;
 
-ChessPiece::ChessPiece(Colour c) : c(c){};
+ChessPiece::ChessPiece(Colour c) : mycolour(c){};
 
-Colour ChessPiece::getColour() { return c; }
+Colour ChessPiece::getColour() { return mycolour; }
 
 vector<Move> *ChessPiece::getValidMoves() { return &validMoves; };
 
-void ChessPiece::filterValidMoves(int x, int y, Board& b)
+void ChessPiece::filterValidMoves(int x, int y, Board &b)
 {
     refreshLegalMoves(x, y, b);
     vector<Move> temp;
     for (int i = 0; i < validMoves.size(); ++i)
-    {    
-        Board newB {b};
-        if (!(resultsInCheck(x, y, validMoves[i], newB)))
+    {
+
+        if (!(resultsInCheck(x, y, validMoves[i], b)))
         {
             temp.emplace_back(validMoves[i]);
         }
@@ -24,30 +25,17 @@ void ChessPiece::filterValidMoves(int x, int y, Board& b)
 
     validMoves.clear();
 
-    for (auto n : temp) {
-        cout << "valid moves: "<< getPieceChar() << n.x << n.y <<endl;
-
+    for (auto n : temp)
+    {
+        cout << "valid moves: " << getPieceChar() << n.x << n.y << endl;
     }
-
     validMoves = temp;
-    
 }
 
 bool ChessPiece::resultsInCheck(int x, int y, Move m, Board boa)
-{
-    boa.makeMove(x, y, m.x, m.y);
-    // for (int i = 0; i < 8; ++i) {
-    //     for (int j = 0; j < 8; ++j) {
-    //         if (boa.getSquare(i,j)->getPiece()) {
-    //             //boa.getSquare(i,j)->getPiece()->refreshLegalMoves(i, j, boa);
-    //             //cout << boa.getSquare(i,j)->getPiece()->getPieceChar();
-    //         } else {
-    //             //cout << "*";
-    //         }
-    //     }
-    //     //cout << endl;
-    // }
-    cout << getPieceChar() << " " << m.x << " " << m.y <<"' " << boa.isChecked(getColour()) << endl;
+{   
+    boa.makeMove(x,y,m.x,m.y);
+    
     return boa.isChecked(getColour());
 }
 
@@ -59,12 +47,13 @@ bool ChessPiece::isLegalMove(int newx, int newy, Colour turn)
     }
 
     for (auto n : validMoves)
-    {  cout << "valid moves: "<< getPieceChar() << n.x << n.y <<endl;
+    {
+        cout << "valid moves: " << getPieceChar() << n.x << n.y << endl;
 
         cout << getPieceChar() << " " << n.x << " " << n.y << endl;
         if (newx == n.x && newy == n.y)
         {
-            
+
             return true;
         }
     }
