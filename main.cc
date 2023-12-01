@@ -28,6 +28,10 @@ int main()
         else if (cmd == "setup") {
            control.setup(cin, cout);
         }
+        else if (cmd == "resign") {
+            control.resign(cout);
+            break;
+        }
 
         else {
             cout << "Invalid Command. Try Again" << endl;

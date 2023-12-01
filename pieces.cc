@@ -8,17 +8,18 @@ ChessPiece::ChessPiece(Colour c) : mycolour(c){};
 
 Colour ChessPiece::getColour() { return mycolour; }
 
-void ChessPiece::deleteMove(int newx, int newy){
-    for(int i = 0; i < validMoves.size(); ++i){
-        if (validMoves.at(i).x == newx && validMoves.at(i).y==newy){
+void ChessPiece::deleteMove(int newx, int newy)
+{
+    for (int i = 0; i < validMoves.size(); ++i)
+    {
+        if (validMoves.at(i).x == newx && validMoves.at(i).y == newy)
+        {
             validMoves.erase(validMoves.begin() + i);
         }
     }
 }
 
 vector<Move> *ChessPiece::getValidMoves() { return &validMoves; };
-
-
 
 bool ChessPiece::isLegalMove(int newx, int newy, Colour turn)
 {
@@ -38,12 +39,11 @@ bool ChessPiece::isLegalMove(int newx, int newy, Colour turn)
     return false;
 }
 
-Pawn::Pawn(Colour c) : ChessPiece(c), moved(false){};
+Pawn::Pawn(Colour c) : ChessPiece(c){};
 void Pawn::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
     int newx;
-
 
     if (getColour() == Colour::White && x == 6)
     {
@@ -54,7 +54,6 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
         if (!temp && !temp2)
         {
             Move doubleMove{x - 2, y, MoveType::STANDARD};
-            moved = true;
             validMoves.emplace_back(doubleMove);
         }
     }
@@ -66,8 +65,6 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
         if (!temp && !temp2)
         {
             Move doubleMove{x + 2, y, MoveType::STANDARD};
-
-            moved = true;
             validMoves.emplace_back(doubleMove);
         }
     }
@@ -93,7 +90,6 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
         if (!temp)
         {
             Move move{newx, y, MoveType::STANDARD};
-
             validMoves.emplace_back(move);
         }
     }
@@ -101,7 +97,7 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
     // capturing moves
     if (getColour() == Colour::White)
     {
-        if (x > 0 && y < b.boardDim-1)
+        if (x > 0 && y < b.boardDim - 1)
         {
             ChessPiece *temp = b.getSquare(x - 1, y + 1)->getPiece();
 
@@ -182,6 +178,12 @@ char Pawn::getPieceChar()
 ChessPiece::~ChessPiece() {}
 
 Rook::Rook(Colour c) : ChessPiece(c), moved(false){};
+
+void Rook::setMoved(bool b)
+{
+    this->moved = b;
+}
+
 void Rook::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
@@ -284,6 +286,12 @@ void Rook::refreshLegalMoves(int x, int y, Board &b)
     }
 }
 PieceType Rook::getType() { return PieceType::ROOK; }
+
+bool Rook::getMoved()
+{
+    return this->moved;
+}
+
 char Rook::getPieceChar()
 {
     if (getColour() == Colour::White)
@@ -420,6 +428,10 @@ char Bishop::getPieceChar()
 }
 
 King::King(Colour c) : ChessPiece(c), moved(false){};
+
+void King::setMoved(bool b) { moved = b; }
+bool King::getMoved() { return moved; }
+
 void King::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
@@ -571,6 +583,26 @@ void King::refreshLegalMoves(int x, int y, Board &b)
         else
         {
             Move move = {x + 1, y - 1, MoveType::STANDARD};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    if (!b.getSquare(x, b.boardDim - 1)->isEmpty())
+    {
+        Rook *ptr = dynamic_cast<Rook *>(b.getSquare(x, b.boardDim - 1)->getPiece());
+        if (!moved && b.getSquare(x, y + 1)->isEmpty() && b.getSquare(x, y + 2)->isEmpty() && ptr && !ptr->getMoved())
+        {
+            Move move = {x, y + 2, MoveType::CASTLING};
+            validMoves.emplace_back(move);
+        }
+    }
+
+    if (!b.getSquare(x, 0)->isEmpty())
+    {
+        Rook *ptr = dynamic_cast<Rook *>(b.getSquare(x, 0)->getPiece());
+        if (!moved && b.getSquare(x, y - 1)->isEmpty() && b.getSquare(x, y - 2)->isEmpty() && ptr && !ptr->getMoved())
+        {
+            Move move = {x, y - 2, MoveType::CASTLING};
             validMoves.emplace_back(move);
         }
     }

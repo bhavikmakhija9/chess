@@ -34,6 +34,21 @@ void Controller::filterValidMoves()
                 {
                     if (n.x >= 0 && n.x < b.boardDim && n.y >= 0 && n.y < b.boardDim)
                     {
+
+                        if (n.type == CASTLING) {
+                            if(n.y > j){
+                                if(!isValidCheckMove(i,j,i,j+1)){
+                                    curCoords.emplace_back(std::pair<int, int>{i, j});
+                                    newCoords.emplace_back(std::pair<int, int>{n.x, n.y});
+                                }
+                            }else if(n.y < j){
+                                if(!isValidCheckMove(i,j,i,j-1)){
+                                    curCoords.emplace_back(std::pair<int, int>{i, j});
+                                    newCoords.emplace_back(std::pair<int, int>{n.x, n.y}); 
+                                }
+                            }
+                        }
+                        
                         if (!isValidCheckMove(i, j, n.x, n.y))
                         {
                             curCoords.emplace_back(std::pair<int, int>{i, j});
@@ -61,6 +76,13 @@ bool Controller::isValidCheckMove(int x, int y, int newx, int newy)
 
     if (tmp)
     {
+        bool hasMoved = true;
+        if (tmp->getType() == KING) {
+            hasMoved = static_cast<King*>(tmp)->getMoved();
+        }
+        if (tmp->getType() == ROOK) {
+            hasMoved = static_cast<Rook*>(tmp)->getMoved();
+        }
         ChessPiece *dest = nullptr;
         if (b.getSquare(newx, newy)->getPiece())
         {
@@ -100,6 +122,16 @@ bool Controller::isValidCheckMove(int x, int y, int newx, int newy)
 
         b.getSquare(newx, newy)->setPiece(dest);
         b.getSquare(x, y)->setPiece(tmp);
+
+        if(!hasMoved){
+            if (tmp->getType() == KING) {
+                static_cast<King*>(tmp)->setMoved(false);
+            }
+            if (tmp->getType() == ROOK) {
+                static_cast<Rook*>(tmp)->setMoved(false);
+            }
+        }
+
         b.refreshLegalMoves();
         return noError;
     }
@@ -150,8 +182,16 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
                     b.makeMove(row, col, newRow, newCol);
                     toggleTurn();
                 }
+            }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING){
+                if (col + 2 == newCol) {
+                    b.makeMove(row,col,newRow,newCol);
+                    b.makeMove(row, b.boardDim-1,newRow,col+1);
+                } else if (col - 2 == newCol){
+                    b.makeMove(row,col,newRow,newCol);
+                    b.makeMove(row, 0,newRow,col-1);
+                }
             }
-            else
+            else //here
             {
                 b.makeMove(row, col, newRow, newCol);
                 toggleTurn();
@@ -393,4 +433,12 @@ bool Controller::checkForStaleMate(ostream &out)
     }
 
     return false;
+}
+
+void Controller::resign(ostream &out) {
+    if (turn == Black) {
+        out << "Black resigned. White wins!" << endl;
+    } else {
+       out << "White resigned. Black wins!" << endl; 
+    }
 }

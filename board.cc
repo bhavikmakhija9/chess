@@ -208,7 +208,27 @@ void Board::defBoard()
 
 void Board::makeMove(int x, int y, int newx, int newy)
 {
+
+    // For Castling
+    if (board[x][y].getPiece()->getType() == KING)
+    {
+        King *ptr = dynamic_cast<King *>(board[x][y].getPiece());
+        if (ptr)
+        {
+            ptr->setMoved(true);
+        }
+    }
+    else if (board[x][y].getPiece()->getType() == ROOK)
+    {
+        Rook *ptr = dynamic_cast<Rook *>(board[x][y].getPiece());
+        if (ptr)
+        {
+            ptr->setMoved(true);
+        }
+    }
+
     board[newx][newy].setPiece(board[x][y].getPiece());
+
     board[x][y].setPiece(nullptr);
 
     board[x][y].clearSquare();
@@ -271,19 +291,21 @@ bool Board::isChecked(Colour c)
     return false;
 }
 
-bool Board::hasNoMoves(Colour c){
+bool Board::hasNoMoves(Colour c)
+{
     for (int i = 0; i < boardDim; i++)
     {
         for (int j = 0; j < boardDim; j++)
         {
-            if (board[i][j].getPiece()&&board[i][j].getPiece()->getColour() == c)
+            if (board[i][j].getPiece() && board[i][j].getPiece()->getColour() == c)
             {
                 vector<Move> *ptr = board[i][j].getPiece()->getValidMoves();
-                if(ptr->size() != 0){
+                if (ptr->size() != 0)
+                {
                     return false;
                 }
             }
         }
     }
-    return true; 
+    return true;
 }

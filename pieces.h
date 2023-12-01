@@ -29,6 +29,7 @@ enum MoveType
     STANDARD,
     DEFENSE,
     CAPTURING,
+    CASTLING,
     CHECKING
 };
 
@@ -58,8 +59,6 @@ public:
 
 class Pawn : public ChessPiece
 {
-    bool moved;
-
 public:
     Pawn(Colour c);
     PieceType getType() override;
@@ -73,6 +72,8 @@ class Rook : public ChessPiece
 
 public:
     Rook(Colour c);
+    void setMoved(bool b);
+    bool getMoved();
     PieceType getType() override;
     void refreshLegalMoves(int x, int y, Board &b) override;
     char getPieceChar() override;
@@ -94,6 +95,8 @@ class King : public ChessPiece
 public:
     King(Colour c);
     PieceType getType() override;
+    void setMoved(bool b);
+    bool getMoved();
     void refreshLegalMoves(int x, int y, Board &b) override;
     char getPieceChar() override;
 };
