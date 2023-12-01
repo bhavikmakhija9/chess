@@ -79,7 +79,7 @@ bool Controller::isValidCheckMove (int x, int y, int newx, int newy){
 }
 }
 
-void Controller::makeMove(string initial, string dest, ostream &out)
+void Controller::makeMove(string initial, string dest, ostream &out, istream &in)
 {
     int row = translateMove(initial).first;
     int col = translateMove(initial).second;
@@ -93,11 +93,40 @@ void Controller::makeMove(string initial, string dest, ostream &out)
     if (tmp) // checking if there is a piece on that square
     {
         if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
-        {
-            b.makeMove(row, col, newRow, newCol);
+        {   
+             
+            if(b.getSquare(row, col)->getPiece()->getPieceChar() == 'p' && newRow == 7) {
+             char newPiece;
+             in >> newPiece;
+             if (newPiece < 'a') {
+                newPiece+=32;
+             }
+             if (newPiece != 'k') {
+                b.getSquare(row, col)->setPiece(translate(newPiece));
+                b.makeMove(row, col, newRow, newCol);
+                toggleTurn();
+             }
+            } else if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'P' && newRow == 0) {
+             char newPiece;
+             in >> newPiece;
+             if (newPiece > 'Z') {
+                newPiece-=32;
+             }
+             if(newPiece != 'K') {
+                b.getSquare(row, col)->setPiece(translate(newPiece));
+                b.makeMove(row, col, newRow, newCol);
+                toggleTurn();
+             }
+            }else{
+                b.makeMove(row, col, newRow, newCol);
+                toggleTurn();
+            }
+
+            
+         
             b.refreshLegalMoves();
             filterValidMoves();
-            toggleTurn();
+            
         }
         else
         {

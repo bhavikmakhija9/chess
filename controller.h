@@ -19,7 +19,7 @@ class Controller
 
 public:
     Controller();
-    void makeMove(string initial, string dest, std::ostream &out);
+    void makeMove(string initial, string dest, std::ostream &out, std::istream &in);
     void makeMove(int x, int y, int newx, int newY);
     void print(std::ostream &out) const;
     void setup(std::istream &in, std::ostream &out);

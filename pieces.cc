@@ -90,7 +90,7 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
             validMoves.emplace_back(doubleMove);
         }
     }
-    else if (x == 1)
+    else if (getColour() == Colour::Black && x == 1)
     {
         ChessPiece *temp = b.getSquare(x + 1, y)->getPiece();
         ChessPiece *temp2 = b.getSquare(x + 2, y)->getPiece();

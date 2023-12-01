@@ -21,7 +21,7 @@ int main()
         else if (cmd == "move")
         {
             cin >> initial >> dest;
-            control.makeMove(initial, dest, cout);
+            control.makeMove(initial, dest, cout, cin);
             control.print(cout);
         }
 

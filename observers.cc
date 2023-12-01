@@ -15,7 +15,7 @@ TextDisplay::TextDisplay()
         {
             theDisplay[i][j] = curr;
 
-            if (curr == '_')//change after
+            if (curr == '_') // change after
             {
                 curr = ' ';
             }
@@ -64,7 +64,7 @@ void TextDisplay::notify(Square &s)
         }
         else if (s.getColour() == Colour::White)
         {
-            theDisplay[x][y] = ' '; //change after
+            theDisplay[x][y] = ' '; // change after
         }
     }
 
@@ -77,7 +77,7 @@ void TextDisplay::notify(Square &s)
 TextDisplay::~TextDisplay() {}
 
 ostream &operator<<(ostream &out, const TextDisplay &td)
-{
+{   out << "\n";
     for (int i = 0; i < 8; ++i)
     {
         out << 8 - i << " ";
@@ -90,5 +90,6 @@ ostream &operator<<(ostream &out, const TextDisplay &td)
     out << "\n";
     out << "  "
         << "abcdefgh" << endl;
+    out << "\n";
     return out;
 }
