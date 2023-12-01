@@ -18,34 +18,7 @@ void ChessPiece::deleteMove(int newx, int newy){
 
 vector<Move> *ChessPiece::getValidMoves() { return &validMoves; };
 
-void ChessPiece::filterValidMoves(int x, int y, Board &b)
-{
-    refreshLegalMoves(x, y, b);
-    vector<Move> temp;
-    for (int i = 0; i < validMoves.size(); ++i)
-    {
 
-        if (!(resultsInCheck(x, y, validMoves[i], b)))
-        {
-            temp.emplace_back(validMoves[i]);
-        }
-    }
-
-    validMoves.clear();
-
-    for (auto n : temp)
-    {
-        cout << "valid moves: " << getPieceChar() << n.x << n.y << endl;
-    }
-    validMoves = temp;
-}
-
-bool ChessPiece::resultsInCheck(int x, int y, Move m, Board boa)
-{   
-    boa.makeMove(x,y,m.x,m.y);
-    
-    return boa.isChecked(getColour());
-}
 
 bool ChessPiece::isLegalMove(int newx, int newy, Colour turn)
 {
@@ -56,9 +29,6 @@ bool ChessPiece::isLegalMove(int newx, int newy, Colour turn)
 
     for (auto n : validMoves)
     {
-        cout << "valid moves: " << getPieceChar() << n.x << n.y << endl;
-
-        cout << getPieceChar() << " " << n.x << " " << n.y << endl;
         if (newx == n.x && newy == n.y)
         {
 
@@ -73,9 +43,7 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
     int newx;
-    // cout << "makes call";
 
-    // validMoves.emplace_back(Move{5,0,MoveType::STANDARD}); //delete this later
 
     if (getColour() == Colour::White && x == 6)
     {

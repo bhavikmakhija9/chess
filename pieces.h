@@ -47,9 +47,7 @@ protected:
 public:
     ChessPiece(Colour c);
     bool isLegalMove(int newx, int newy, Colour turn);
-    bool resultsInCheck(int x, int y, Move m, Board b);
     vector<Move> *getValidMoves();
-    void filterValidMoves(int x, int y, Board &b);
     void deleteMove(int newx, int newy);
     virtual void refreshLegalMoves(int x, int y, Board &b) = 0;
     Colour getColour();
