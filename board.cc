@@ -270,3 +270,20 @@ bool Board::isChecked(Colour c)
     }
     return false;
 }
+
+bool Board::hasNoMoves(Colour c){
+    for (int i = 0; i < boardDim; i++)
+    {
+        for (int j = 0; j < boardDim; j++)
+        {
+            if (board[i][j].getPiece()&&board[i][j].getPiece()->getColour() == c)
+            {
+                vector<Move> *ptr = board[i][j].getPiece()->getValidMoves();
+                if(ptr->size() != 0){
+                    return false;
+                }
+            }
+        }
+    }
+    return true; 
+}

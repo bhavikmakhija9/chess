@@ -15,14 +15,15 @@ class Controller
     void toggleTurn();
     void filterValidMoves();
     bool isValidCheckMove(int x, int y, int newx, int newY);
-    void checkForCheck(std::ostream &out);
-
-public:
-    Controller();
-    void makeMove(string initial, string dest, std::ostream &out, std::istream &in);
-    void makeMove(int x, int y, int newx, int newY);
-    void print(std::ostream &out) const;
-    void setup(std::istream &in, std::ostream &out);
-    void setBoard(Board b);
+    bool checkForCheck(std::ostream &out);
+    bool checkForCheckMate(std::ostream &out);
+    bool checkForStaleMate(ostream &out);
+    public:
+        Controller();
+        void makeMove(string initial, string dest, std::ostream &out, std::istream &in);
+        void makeMove(int x, int y, int newx, int newY);
+        void print(std::ostream &out) const;
+        void setup(std::istream &in, std::ostream &out);
+        void setBoard(Board b);
 };
 #endif

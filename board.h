@@ -48,5 +48,6 @@ public:
     void emptyBoard();
     Square *getSquare(int x, int y);
     bool isChecked(Colour c);
+    bool hasNoMoves(Colour c);
 };
 #endif

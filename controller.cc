@@ -2,7 +2,8 @@
 
 using namespace std;
 
-void Controller::setBoard(Board newB) {
+void Controller::setBoard(Board newB)
+{
     b = newB;
 }
 Controller::Controller() : td(new TextDisplay), turn(White)
@@ -19,64 +20,89 @@ std::pair<int, int> Controller::translateMove(string str)
     return std::pair<int, int>{row, col};
 }
 
-void Controller::filterValidMoves (){
+void Controller::filterValidMoves()
+{
     vector<std::pair<int, int>> curCoords;
     vector<std::pair<int, int>> newCoords;
-    for(int i = 0; i< b.boardDim; ++i){
-        for(int j = 0; j<b.boardDim; ++j){
-            if(b.getSquare(i,j)->getPiece()){
-                for(auto n : *b.getSquare(i,j)->getPiece()->getValidMoves()){
-                    if(n.x >= 0 && n.x < b.boardDim && n.y>=0 && n.y < b.boardDim) {
-                        if (!isValidCheckMove(i,j,n.x,n.y)) {
+    for (int i = 0; i < b.boardDim; ++i)
+    {
+        for (int j = 0; j < b.boardDim; ++j)
+        {
+            if (b.getSquare(i, j)->getPiece())
+            {
+                for (auto n : *b.getSquare(i, j)->getPiece()->getValidMoves())
+                {
+                    if (n.x >= 0 && n.x < b.boardDim && n.y >= 0 && n.y < b.boardDim)
+                    {
+                        if (!isValidCheckMove(i, j, n.x, n.y))
+                        {
                             curCoords.emplace_back(std::pair<int, int>{i, j});
                             newCoords.emplace_back(std::pair<int, int>{n.x, n.y});
                         }
-                    } else {
+                    }
+                    else
+                    {
                         b.getSquare(i, j)->getPiece()->deleteMove(n.x, n.y);
                     }
                 }
             }
         }
     }
-    for (int i = 0; i < curCoords.size(); i++) {
-        b.getSquare(curCoords[i]. first, curCoords[i].second)->getPiece()->deleteMove(newCoords[i]. first, newCoords[i].second);
+    for (int i = 0; i < curCoords.size(); i++)
+    {
+        b.getSquare(curCoords[i].first, curCoords[i].second)->getPiece()->deleteMove(newCoords[i].first, newCoords[i].second);
     }
 }
 
-bool Controller::isValidCheckMove (int x, int y, int newx, int newy){
+bool Controller::isValidCheckMove(int x, int y, int newx, int newy)
+{
     ChessPiece *tmp = b.getSquare(x, y)->getPiece();
     bool noError = true;
 
-    if(tmp){
-        ChessPiece* dest = nullptr;
-        if (b.getSquare(newx, newy)->getPiece()) {
-            if (b.getSquare(newx, newy)->getPiece()->getType() == PAWN) {
-                dest = new Pawn(*(static_cast<Pawn*>(b.getSquare(newx, newy)->getPiece())));
-            } else if (b.getSquare(newx, newy)->getPiece()->getType() == ROOK) {
-                dest = new Rook(*(static_cast<Rook*>(b.getSquare(newx, newy)->getPiece())));
-            } else if (b.getSquare(newx, newy)->getPiece()->getType() == BISHOP) {
-                dest = new Bishop(*(static_cast<Bishop*>(b.getSquare(newx, newy)->getPiece())));
-            } else if (b.getSquare(newx, newy)->getPiece()->getType() == KING) {
-                dest = new King(*(static_cast<King*>(b.getSquare(newx, newy)->getPiece())));
-            } else if (b.getSquare(newx, newy)->getPiece()->getType() == QUEEN) {
-                dest = new Queen(*(static_cast<Queen*>(b.getSquare(newx, newy)->getPiece())));
-            } else if (b.getSquare(newx, newy)->getPiece()->getType() == KNIGHT) {
-                dest = new Knight(*(static_cast<Knight*>(b.getSquare(newx, newy)->getPiece())));
-            } 
+    if (tmp)
+    {
+        ChessPiece *dest = nullptr;
+        if (b.getSquare(newx, newy)->getPiece())
+        {
+            if (b.getSquare(newx, newy)->getPiece()->getType() == PAWN)
+            {
+                dest = new Pawn(*(static_cast<Pawn *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == ROOK)
+            {
+                dest = new Rook(*(static_cast<Rook *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == BISHOP)
+            {
+                dest = new Bishop(*(static_cast<Bishop *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == KING)
+            {
+                dest = new King(*(static_cast<King *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == QUEEN)
+            {
+                dest = new Queen(*(static_cast<Queen *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == KNIGHT)
+            {
+                dest = new Knight(*(static_cast<Knight *>(b.getSquare(newx, newy)->getPiece())));
+            }
         }
 
         b.makeMove(x, y, newx, newy);
         b.refreshLegalMoves();
-            
-        if(b.isChecked(turn)) {
+
+        if (b.isChecked(turn))
+        {
             noError = false;
         }
 
         b.getSquare(newx, newy)->setPiece(dest);
-        b.getSquare(x,y)->setPiece(tmp);
+        b.getSquare(x, y)->setPiece(tmp);
         b.refreshLegalMoves();
         return noError;
-}
+    }
 }
 
 void Controller::makeMove(string initial, string dest, ostream &out, istream &in)
@@ -93,40 +119,46 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
     if (tmp) // checking if there is a piece on that square
     {
         if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
-        {   
-             
-            if(b.getSquare(row, col)->getPiece()->getPieceChar() == 'p' && newRow == 7) {
-             char newPiece;
-             in >> newPiece;
-             if (newPiece < 'a') {
-                newPiece+=32;
-             }
-             if (newPiece != 'k') {
-                b.getSquare(row, col)->setPiece(translate(newPiece));
-                b.makeMove(row, col, newRow, newCol);
-                toggleTurn();
-             }
-            } else if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'P' && newRow == 0) {
-             char newPiece;
-             in >> newPiece;
-             if (newPiece > 'Z') {
-                newPiece-=32;
-             }
-             if(newPiece != 'K') {
-                b.getSquare(row, col)->setPiece(translate(newPiece));
-                b.makeMove(row, col, newRow, newCol);
-                toggleTurn();
-             }
-            }else{
+        {
+
+            if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'p' && newRow == 7)
+            {
+                char newPiece;
+                in >> newPiece;
+                if (newPiece < 'a')
+                {
+                    newPiece += 32;
+                }
+                if (newPiece != 'k')
+                {
+                    b.getSquare(row, col)->setPiece(translate(newPiece));
+                    b.makeMove(row, col, newRow, newCol);
+                    toggleTurn();
+                }
+            }
+            else if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'P' && newRow == 0)
+            {
+                char newPiece;
+                in >> newPiece;
+                if (newPiece > 'Z')
+                {
+                    newPiece -= 32;
+                }
+                if (newPiece != 'K')
+                {
+                    b.getSquare(row, col)->setPiece(translate(newPiece));
+                    b.makeMove(row, col, newRow, newCol);
+                    toggleTurn();
+                }
+            }
+            else
+            {
                 b.makeMove(row, col, newRow, newCol);
                 toggleTurn();
             }
 
-            
-         
             b.refreshLegalMoves();
             filterValidMoves();
-            
         }
         else
         {
@@ -137,7 +169,15 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
     {
         out << "No Piece there" << endl;
     }
-    checkForCheck(out);
+    if (checkForCheckMate(out))
+    {
+    }
+    else if (checkForCheck(out))
+    {
+    }
+    else if (checkForStaleMate(out))
+    {
+    }
 }
 
 ChessPiece *Controller::translate(char c)
@@ -270,6 +310,10 @@ void Controller::setup(std::istream &in, std::ostream &out)
             {
                 out << "There is not exactly one White King" << endl;
             }
+            else if (b.isChecked(Black) || b.isChecked(White))
+            {
+                out << "Atleast one of the Kings is in check" << endl;
+            }
 
             else
             {
@@ -282,21 +326,26 @@ void Controller::setup(std::istream &in, std::ostream &out)
     }
 }
 
-void Controller::checkForCheck(ostream &out)
+bool Controller::checkForCheck(ostream &out)
 {
     if (b.isChecked(Black))
     {
         out << "Black is in check" << endl;
+        return true;
     }
 
     if (b.isChecked(White))
     {
         out << "White is in check" << endl;
+        return true;
     }
+
+    return false;
 }
 
-    void Controller::makeMove(int x, int y, int newx, int newY) {
-     b.refreshLegalMoves();
+void Controller::makeMove(int x, int y, int newx, int newY)
+{
+    b.refreshLegalMoves();
 
     ChessPiece *tmp = b.getSquare(x, y)->getPiece();
 
@@ -310,4 +359,38 @@ void Controller::checkForCheck(ostream &out)
             toggleTurn();
         }
     }
+}
+
+bool Controller::checkForCheckMate(ostream &out)
+{
+    if (b.isChecked(Black) && b.hasNoMoves(Black))
+    {
+        out << "White Wins" << endl;
+        return true;
     }
+
+    if (b.isChecked(White) && b.hasNoMoves(White))
+    {
+        out << "Black Wins" << endl;
+        return true;
+    }
+
+    return false;
+}
+
+bool Controller::checkForStaleMate(ostream &out)
+{
+    if (!b.isChecked(Black) && b.hasNoMoves(Black))
+    {
+        out << "Stalemate!" << endl;
+        return true;
+    }
+
+    if (!b.isChecked(White) && b.hasNoMoves(White))
+    {
+        out << "Stalemate!" << endl;
+        return true;
+    }
+
+    return false;
+}
