@@ -182,14 +182,13 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
                     b.makeMove(row, col, newRow, newCol);
                     toggleTurn();
                 }
-            }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING){
-                if (col + 2 == newCol) {
-                    b.makeMove(row,col,newRow,newCol);
-                    b.makeMove(row, b.boardDim-1,newRow,col+1);
-                } else if (col - 2 == newCol){
-                    b.makeMove(row,col,newRow,newCol);
+            }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col + 2 == newCol) {
+                b.makeMove(row,col,newRow,newCol);
+                b.makeMove(row, b.boardDim-1,newRow,col+1);
+            } 
+            else if (b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col - 2 == newCol) {
+                b.makeMove(row,col,newRow,newCol);
                     b.makeMove(row, 0,newRow,col-1);
-                }
             }
             else //here
             {

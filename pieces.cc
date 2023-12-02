@@ -251,7 +251,7 @@ void Rook::refreshLegalMoves(int x, int y, Board &b)
             Move move{x, newY, MoveType::CAPTURING};
             if (temp->getType() == KING && temp->getColour() != getColour())
             {
-                move = {newX, y, MoveType::CHECKING};
+                move = {x, newY, MoveType::CHECKING};
             }
             validMoves.emplace_back(move);
             break;
@@ -275,7 +275,7 @@ void Rook::refreshLegalMoves(int x, int y, Board &b)
             Move move{x, newY, MoveType::CAPTURING};
             if (temp->getType() == KING && temp->getColour() != getColour())
             {
-                move = {newX, y, MoveType::CHECKING};
+                move = {x, newY, MoveType::CHECKING};
             }
             validMoves.emplace_back(move);
             break;
