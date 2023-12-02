@@ -30,6 +30,7 @@ enum MoveType
     DEFENSE,
     CAPTURING,
     CASTLING,
+    ENPASSANT,
     CHECKING
 };
 
@@ -59,8 +60,11 @@ public:
 
 class Pawn : public ChessPiece
 {
+    bool justMovedTwo;
 public:
     Pawn(Colour c);
+    void setMovedTwo(bool b);
+    bool getMovedTwo();
     PieceType getType() override;
     void refreshLegalMoves(int x, int y, Board &b) override;
     char getPieceChar() override;

@@ -40,6 +40,11 @@ bool ChessPiece::isLegalMove(int newx, int newy, Colour turn)
 }
 
 Pawn::Pawn(Colour c) : ChessPiece(c){};
+
+void Pawn::setMovedTwo(bool b) { justMovedTwo = b; }
+
+bool Pawn::getMovedTwo() { return justMovedTwo; }
+
 void Pawn::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
@@ -110,6 +115,14 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
                 }
                 validMoves.emplace_back(move);
             }
+            // En Passant
+            if (!temp) {
+                ChessPiece *passed2 = b.getSquare(x, y + 1)->getPiece();
+                if (passed2 && passed2->getType() == PieceType::PAWN && passed2->getColour() == Colour::Black && static_cast<Pawn*>(passed2)->getMovedTwo()) {
+                    Move enpassant = {x - 1, y + 1, MoveType::ENPASSANT};
+                    validMoves.emplace_back(enpassant);
+                }
+            }
         }
 
         if (x > 0 && y > 0)
@@ -124,6 +137,14 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
                     move = {x - 1, y - 1, MoveType::CHECKING};
                 }
                 validMoves.emplace_back(move);
+            }
+            // En Passant
+            if (!temp2) {
+                ChessPiece *passed2 = b.getSquare(x, y - 1)->getPiece();
+                if (passed2 && passed2->getType() == PieceType::PAWN && passed2->getColour() == Colour::Black && static_cast<Pawn*>(passed2)->getMovedTwo()) {
+                    Move enpassant = {x - 1, y - 1, MoveType::ENPASSANT};
+                    validMoves.emplace_back(enpassant);
+                }
             }
         }
     }
@@ -142,6 +163,14 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
                 }
                 validMoves.emplace_back(move);
             }
+            // En Passant
+            if (!temp) {
+                ChessPiece *passed2 = b.getSquare(x, y + 1)->getPiece();
+                if (passed2 && passed2->getType() == PieceType::PAWN && passed2->getColour() == Colour::White && static_cast<Pawn*>(passed2)->getMovedTwo()) {
+                    Move enpassant = {x + 1, y + 1, MoveType::ENPASSANT};
+                    validMoves.emplace_back(enpassant);
+                }
+            }
         }
 
         if (x < b.boardDim - 1 && y > 0)
@@ -156,6 +185,14 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
                     move = {x + 1, y - 1, MoveType::CHECKING};
                 }
                 validMoves.emplace_back(move);
+            }
+            // En Passant
+            if (!temp2) {
+                ChessPiece *passed2 = b.getSquare(x, y - 1)->getPiece();
+                if (passed2 && passed2->getType() == PieceType::PAWN && passed2->getColour() == Colour::White && static_cast<Pawn*>(passed2)->getMovedTwo()) {
+                    Move enpassant = {x + 1, y - 1, MoveType::ENPASSANT};
+                    validMoves.emplace_back(enpassant);
+                }
             }
         }
     }
@@ -592,8 +629,10 @@ void King::refreshLegalMoves(int x, int y, Board &b)
         Rook *ptr = dynamic_cast<Rook *>(b.getSquare(x, b.boardDim - 1)->getPiece());
         if (!moved && b.getSquare(x, y + 1)->isEmpty() && b.getSquare(x, y + 2)->isEmpty() && ptr && !ptr->getMoved())
         {
-            Move move = {x, y + 2, MoveType::CASTLING};
-            validMoves.emplace_back(move);
+            if ((getColour() == Colour::White && x == b.boardDim-1 && y == 4) || (getColour() == Colour::White && x == 0 && y == 4)) {
+                Move move = {x, y + 2, MoveType::CASTLING};
+                validMoves.emplace_back(move);
+            }
         }
     }
 
@@ -602,8 +641,10 @@ void King::refreshLegalMoves(int x, int y, Board &b)
         Rook *ptr = dynamic_cast<Rook *>(b.getSquare(x, 0)->getPiece());
         if (!moved && b.getSquare(x, y - 1)->isEmpty() && b.getSquare(x, y - 2)->isEmpty() && ptr && !ptr->getMoved())
         {
-            Move move = {x, y - 2, MoveType::CASTLING};
-            validMoves.emplace_back(move);
+            if ((getColour() == Colour::White && x == b.boardDim-1 && y == 4) || (getColour() == Colour::Black && x == 0 && y == 4)) {
+                Move move = {x, y - 2, MoveType::CASTLING};
+                validMoves.emplace_back(move);
+            }
         }
     }
 }

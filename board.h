@@ -34,7 +34,6 @@ class Board
 {
     vector<vector<Square>> board;
     void setWarFormationRows(int i, Colour c);
-
 public:
     const int boardDim = 8;
     Board();

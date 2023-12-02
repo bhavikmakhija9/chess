@@ -225,6 +225,13 @@ void Board::makeMove(int x, int y, int newx, int newy)
         {
             ptr->setMoved(true);
         }
+    } 
+    // For En Passant
+    else if (board[x][y].getPiece()->getType() == PAWN) { 
+        Pawn *ptr = static_cast<Pawn *>(board[x][y].getPiece());
+        if (x + 2 == newx || x - 2 == newx) {
+            ptr->setMovedTwo(true);
+        }
     }
 
     board[newx][newy].setPiece(board[x][y].getPiece());

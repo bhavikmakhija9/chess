@@ -153,7 +153,7 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
         if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
         {
 
-            if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'p' && newRow == 7)
+            if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'p' && newRow == b.boardDim-1)
             {
                 char newPiece;
                 in >> newPiece;
@@ -188,7 +188,7 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
             } 
             else if (b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col - 2 == newCol) {
                 b.makeMove(row,col,newRow,newCol);
-                    b.makeMove(row, 0,newRow,col-1);
+                b.makeMove(row, 0,newRow,col-1);
             }
             else //here
             {
