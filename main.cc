@@ -15,22 +15,12 @@ int main()
     {
 
         if (cmd == "game")
-        {
-        }
-
-        else if (cmd == "move")
-        {
-            cin >> initial >> dest;
-            control.makeMove(initial, dest, cout, cin);
-            control.print(cout);
+        { 
+            control.startGame(cin, cout);
         }
 
         else if (cmd == "setup") {
            control.setup(cin, cout);
-        }
-        else if (cmd == "resign") {
-            control.resign(cout);
-            break;
         }
 
         else {
