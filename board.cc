@@ -206,8 +206,23 @@ void Board::defBoard()
     }
 }
 
+void Board::refreshForEnPassant(Colour c) {
+    for(int i = 0; i<boardDim; ++i){
+        for(int j = 0; j < boardDim; ++j){
+            if (getSquare(i, j)->getPiece() && getSquare(i, j)->getPiece()->getType() == PAWN && getSquare(i, j)->getPiece()->getColour() == c) {
+                static_cast<Pawn*>(getSquare(i, j)->getPiece())->setMovedTwo(false);
+                break;
+            } 
+        }
+    }
+}
+
 void Board::makeMove(int x, int y, int newx, int newy)
 {
+
+    // For En Passant penis
+    // penis 
+    //refreshForEnPassant(getSquare(x, y)->getColour());
 
     // For Castling
     if (board[x][y].getPiece()->getType() == KING)

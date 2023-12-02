@@ -2,10 +2,6 @@
 
 using namespace std;
 
-void Controller::setBoard(Board newB)
-{
-    b = newB;
-}
 Controller::Controller() : td(new TextDisplay), turn(White)
 {
     b.defBoard();
@@ -53,11 +49,13 @@ void Controller::filterValidMoves()
                         {
                             curCoords.emplace_back(std::pair<int, int>{i, j});
                             newCoords.emplace_back(std::pair<int, int>{n.x, n.y});
+                            if (n.type == ENPASSANT) cout << "deleting enpassant" << endl;
                         }
                     }
                     else
                     {
                         b.getSquare(i, j)->getPiece()->deleteMove(n.x, n.y);
+                        if (n.type == ENPASSANT) cout << "deleting enpassant" << endl;
                     }
                 }
             }
@@ -77,13 +75,28 @@ bool Controller::isValidCheckMove(int x, int y, int newx, int newy)
     if (tmp)
     {
         bool hasMoved = true;
+        bool enPassant = false;
+
         if (tmp->getType() == KING) {
             hasMoved = static_cast<King*>(tmp)->getMoved();
         }
         if (tmp->getType() == ROOK) {
             hasMoved = static_cast<Rook*>(tmp)->getMoved();
         }
+
         ChessPiece *dest = nullptr;
+        if(tmp->getType() == PAWN){
+            Pawn *ourPawn = static_cast<Pawn*>(tmp);
+
+            for(auto n: *ourPawn->getValidMoves()){
+                if(n.type == ENPASSANT && n.x == newx && n.y == newy) {
+                    enPassant = true;
+                    dest = new Pawn(*(static_cast<Pawn *>(b.getSquare(x, newy)->getPiece())));
+                }
+            }
+        }
+
+
         if (b.getSquare(newx, newy)->getPiece())
         {
             if (b.getSquare(newx, newy)->getPiece()->getType() == PAWN)
@@ -119,8 +132,14 @@ bool Controller::isValidCheckMove(int x, int y, int newx, int newy)
         {
             noError = false;
         }
-
-        b.getSquare(newx, newy)->setPiece(dest);
+        if(enPassant){
+            b.getSquare(x,newy)->setPiece(dest);
+            static_cast<Pawn*>(dest)->setMovedTwo(true);
+            b.getSquare(newx,newy)->setPiece(nullptr);
+        }else{
+            b.getSquare(newx, newy)->setPiece(dest);
+        }
+        
         b.getSquare(x, y)->setPiece(tmp);
 
         if(!hasMoved){
@@ -145,11 +164,14 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
     int newCol = translateMove(dest).second;
     b.refreshLegalMoves();
     filterValidMoves();
-
+    
     ChessPiece *tmp = b.getSquare(row, col)->getPiece();
 
     if (tmp) // checking if there is a piece on that square
     {
+        for (auto n : *tmp->getValidMoves()) {
+
+        }
         if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
         {
 
@@ -166,6 +188,7 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
                     b.getSquare(row, col)->setPiece(translate(newPiece));
                     b.makeMove(row, col, newRow, newCol);
                     toggleTurn();
+                    b.refreshForEnPassant(turn);
                 }
             }
             else if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'P' && newRow == 0)
@@ -181,23 +204,46 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
                     b.getSquare(row, col)->setPiece(translate(newPiece));
                     b.makeMove(row, col, newRow, newCol);
                     toggleTurn();
+                    b.refreshForEnPassant(turn);
                 }
             }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col + 2 == newCol) {
                 b.makeMove(row,col,newRow,newCol);
                 b.makeMove(row, b.boardDim-1,newRow,col+1);
+                toggleTurn();
+                b.refreshForEnPassant(turn);
             } 
             else if (b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col - 2 == newCol) {
                 b.makeMove(row,col,newRow,newCol);
                 b.makeMove(row, 0,newRow,col-1);
-            }
-            else //here
-            {
-                b.makeMove(row, col, newRow, newCol);
                 toggleTurn();
+                b.refreshForEnPassant(turn);
+            }
+            else
+            {
+                bool enPassant = false;
+                ChessPiece *ourPawn = b.getSquare(row, col)->getPiece();
+                
+                for(auto n: *ourPawn->getValidMoves()){
+                    if(n.type == ENPASSANT && n.x == newRow && n.y == newCol) {
+                        enPassant = true;
+                    }
+                }
+
+                if(!enPassant){
+                    b.makeMove(row, col, newRow, newCol);
+                    toggleTurn();
+                    b.refreshForEnPassant(turn);
+                }else{
+                    b.makeMove(row, col, newRow, newCol);
+                    b.getSquare(row, newCol)->setPiece(nullptr);
+                    toggleTurn();
+                    b.refreshForEnPassant(turn);
+                }
             }
 
             b.refreshLegalMoves();
             filterValidMoves();
+            
         }
         else
         {

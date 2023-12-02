@@ -24,7 +24,6 @@ class Controller
         void makeMove(int x, int y, int newx, int newY);
         void print(std::ostream &out) const;
         void setup(std::istream &in, std::ostream &out);
-        void setBoard(Board b);
         void resign(std::ostream &out);
 };
 #endif

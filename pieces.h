@@ -60,7 +60,7 @@ public:
 
 class Pawn : public ChessPiece
 {
-    bool justMovedTwo;
+    bool justMovedTwo = false;
 public:
     Pawn(Colour c);
     void setMovedTwo(bool b);

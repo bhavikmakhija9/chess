@@ -41,6 +41,7 @@ public:
     Board& operator=(const Board &other);
     void clearBoard();
     void refreshLegalMoves();
+    void refreshForEnPassant(Colour c);
     void defBoard();
     void makeMove(int x, int y, int newx, int newy);
     void attachDisplay(Observer *o);
