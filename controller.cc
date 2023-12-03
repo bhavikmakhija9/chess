@@ -291,7 +291,7 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
                     b.makeMove(row, col, newRow, newCol);
                     toggleTurn();
                 }
-            }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING){
+            }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && ((col+2 == newCol)||(col-2 == newCol))){
                 if (col + 2 == newCol) {
                     b.makeMove(row,col,newRow,newCol);
                     b.makeMove(row, b.boardDim-1,newRow,col+1);
@@ -312,6 +312,7 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
         else
         {
             out << "Illegal Move" << endl;
+            out << tmp->getPieceChar() << newRow << newCol <<endl;
         }
     }
     else
@@ -365,7 +366,7 @@ void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out
                     b.makeMove(row, col, newRow, newCol);
                     toggleTurn();
                 }
-            }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING){
+            }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && ((col+2 == newCol)||(col-2 == newCol))){
                 if (col + 2 == newCol) {
                     b.makeMove(row,col,newRow,newCol);
                     b.makeMove(row, b.boardDim-1,newRow,col+1);
@@ -386,6 +387,7 @@ void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out
         else
         {
             out << "Illegal Move" << endl;
+            out << tmp->getPieceChar() << newRow << newCol <<endl;
         }
     }
     else
@@ -630,6 +632,7 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
     for (int i = 0; i < b.boardDim; ++i) {
         for (int j = 0; j <b.boardDim; ++j) {
             Square *tmp = b.getSquare(i,j);
+             filterValidMoves();
             if(tmp->getPiece() && (tmp->getPiece()->getColour() == c)&& (*tmp->getPiece()->getValidMoves()).size() != 0) {
                 cout <<"ft"<< i << j << endl;
                 pieces.emplace_back(tmp);
@@ -638,6 +641,7 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
     }
  
     srand(time(NULL));
+    
     int random = rand()%pieces.size();
 
     Square * randomSquare = pieces.at(random);
@@ -657,7 +661,7 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
 pair<pair<int,int>,pair<int,int>> Controller:: generateLV2Move(Colour c) {
 vector <Square *> &pieces = whitePieces;
 
- b.refreshLegalMoves();
+  b.refreshLegalMoves();
   filterValidMoves(); 
 
   if (c == Black) 
@@ -679,11 +683,13 @@ vector <Square *> &pieces = whitePieces;
             Square *tmp = b.getSquare(i,j);
             if(tmp->getPiece() && tmp->getPiece()->getColour() == c && (*tmp->getPiece()->getValidMoves()).size() != 0) {
                 pieces.emplace_back(tmp);
+                cout << "Square" << tmp->getX() << tmp->getY() << endl;
             }
         }
     }
 
     for(auto square: pieces) {
+             filterValidMoves();
        auto m = *(square->getPiece()->getValidMoves());
         for (auto move : m) {
              if(checksOtherPlayer(square->getX(), square->getY(), move.x, move.y)) {
@@ -699,8 +705,10 @@ vector <Square *> &pieces = whitePieces;
 
        if (noCheckingMove) {
         for(auto square: pieces) {
+                  filterValidMoves(); 
             auto m = *(square->getPiece()->getValidMoves());
         for (auto move : m) {
+            cout << "says valid:" <<square->getPiece()->getPieceChar() <<move.x <<move.y <<endl;
              if(move.type == CAPTURING) {
                 noCapturingMove = false;
                 x = square->getX();

@@ -14,7 +14,7 @@ TextDisplay::TextDisplay()
         for (int j = 0; j < 8; ++j)
         {
             theDisplay[i][j] = curr;
-
+            if(j != 7) {
             if (curr == '_') // change after
             {
                 curr = ' ';
@@ -22,6 +22,7 @@ TextDisplay::TextDisplay()
             else
             {
                 curr = '_';
+            }
             }
         }
     }
