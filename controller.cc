@@ -1,5 +1,6 @@
 #include "controller.h"
 
+
 using namespace std;
 
 Controller::Controller() : td(new TextDisplay), turn(White)
@@ -156,6 +157,247 @@ bool Controller::isValidCheckMove(int x, int y, int newx, int newy)
     }
 }
 
+bool Controller::checksOtherPlayer(int x, int y, int newx, int newy)
+{
+    ChessPiece *tmp = b.getSquare(x, y)->getPiece();
+    
+    Colour oppC = (tmp->getColour() == Black ? White : Black);
+
+    bool checksOther = false;
+
+    if (tmp)
+    {
+        bool hasMoved = true;
+        bool enPassant = false;
+
+        if (tmp->getType() == KING) {
+            hasMoved = static_cast<King*>(tmp)->getMoved();
+        }
+        if (tmp->getType() == ROOK) {
+            hasMoved = static_cast<Rook*>(tmp)->getMoved();
+        }
+
+        ChessPiece *dest = nullptr;
+        if(tmp->getType() == PAWN){
+            Pawn *ourPawn = static_cast<Pawn*>(tmp);
+
+            for(auto n: *ourPawn->getValidMoves()){
+                if(n.type == ENPASSANT && n.x == newx && n.y == newy) {
+                    enPassant = true;
+                    dest = new Pawn(*(static_cast<Pawn *>(b.getSquare(x, newy)->getPiece())));
+                }
+            }
+        }
+
+
+        if (b.getSquare(newx, newy)->getPiece())
+        {
+            if (b.getSquare(newx, newy)->getPiece()->getType() == PAWN)
+            {
+                dest = new Pawn(*(static_cast<Pawn *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == ROOK)
+            {
+                dest = new Rook(*(static_cast<Rook *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == BISHOP)
+            {
+                dest = new Bishop(*(static_cast<Bishop *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == KING)
+            {
+                dest = new King(*(static_cast<King *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == QUEEN)
+            {
+                dest = new Queen(*(static_cast<Queen *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == KNIGHT)
+            {
+                dest = new Knight(*(static_cast<Knight *>(b.getSquare(newx, newy)->getPiece())));
+            }
+        }
+
+        b.makeMove(x, y, newx, newy);
+        b.refreshLegalMoves();
+
+        if (b.isChecked(oppC))
+        {
+            checksOther = true;
+        }
+        if(enPassant){
+            b.getSquare(x,newy)->setPiece(dest);
+            static_cast<Pawn*>(dest)->setMovedTwo(true);
+            b.getSquare(newx,newy)->setPiece(nullptr);
+        }else{
+            b.getSquare(newx, newy)->setPiece(dest);
+        }
+        
+        b.getSquare(x, y)->setPiece(tmp);
+
+        if(!hasMoved){
+            if (tmp->getType() == KING) {
+                static_cast<King*>(tmp)->setMoved(false);
+            }
+            if (tmp->getType() == ROOK) {
+                static_cast<Rook*>(tmp)->setMoved(false);
+            }
+        }
+
+        b.refreshLegalMoves();
+        return checksOther;
+    }
+}
+
+void Controller::startGame(std::istream &in, std::ostream &out) {
+    string player1, player2, cmd;
+
+    gameNotDone = true;
+
+    in >> player1 >> player2;
+
+    whitePlayer = translatePlayer(player1);
+
+    blackPlayer = translatePlayer(player2);
+
+    while (in >> cmd && gameNotDone) {
+        if (cmd == "move")
+        {
+        PlayerType player = whitePlayer;
+        if (turn == Black) {
+            player = blackPlayer;
+        }
+            if (player == Human) {
+            string initial, dest;
+            in >> initial >> dest;
+            makeMove(initial, dest, out, in);
+       
+         } else if (player == LV1) {
+           pair<pair<int,int>,pair<int,int>> move = generateLV1Move(turn);
+           makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
+         } else if (player == LV2) {
+            pair<pair<int,int>,pair<int,int>> move = generateLV2Move(turn);
+           makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
+         }
+           print(out);
+        }
+         else if (cmd == "resign") {
+            resign(cout);
+            break;
+        }
+    }
+}
+
+bool Controller::checksOtherPlayer(int x, int y, int newx, int newy)
+{
+    ChessPiece *tmp = b.getSquare(x, y)->getPiece();
+    
+    Colour oppC = (tmp->getColour() == Black ? White : Black);
+
+    bool checksOther = false;
+
+    if (tmp)
+    {
+        bool hasMoved = true;
+        if (tmp->getType() == KING) {
+            hasMoved = static_cast<King*>(tmp)->getMoved();
+        }
+        if (tmp->getType() == ROOK) {
+            hasMoved = static_cast<Rook*>(tmp)->getMoved();
+        }
+        ChessPiece *dest = nullptr;
+        if (b.getSquare(newx, newy)->getPiece())
+        {
+            if (b.getSquare(newx, newy)->getPiece()->getType() == PAWN)
+            {
+                dest = new Pawn(*(static_cast<Pawn *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == ROOK)
+            {
+                dest = new Rook(*(static_cast<Rook *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == BISHOP)
+            {
+                dest = new Bishop(*(static_cast<Bishop *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == KING)
+            {
+                dest = new King(*(static_cast<King *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == QUEEN)
+            {
+                dest = new Queen(*(static_cast<Queen *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == KNIGHT)
+            {
+                dest = new Knight(*(static_cast<Knight *>(b.getSquare(newx, newy)->getPiece())));
+            }
+        }
+
+        b.makeMove(x, y, newx, newy);
+        b.refreshLegalMoves();
+
+        if (b.isChecked(oppC))
+        {
+            checksOther = true;
+        }
+
+        b.getSquare(newx, newy)->setPiece(dest);
+        b.getSquare(x, y)->setPiece(tmp);
+
+        if(!hasMoved){
+            if (tmp->getType() == KING) {
+                static_cast<King*>(tmp)->setMoved(false);
+            }
+            if (tmp->getType() == ROOK) {
+                static_cast<Rook*>(tmp)->setMoved(false);
+            }
+        }
+
+        b.refreshLegalMoves();
+        return checksOther;
+    }
+}
+
+void Controller::startGame(std::istream &in, std::ostream &out) {
+    string player1, player2, cmd;
+
+    gameNotDone = true;
+
+    in >> player1 >> player2;
+
+    whitePlayer = translatePlayer(player1);
+
+    blackPlayer = translatePlayer(player2);
+
+    while (in >> cmd && gameNotDone) {
+        if (cmd == "move")
+        {
+        PlayerType player = whitePlayer;
+        if (turn == Black) {
+            player = blackPlayer;
+        }
+            if (player == Human) {
+            string initial, dest;
+            in >> initial >> dest;
+            makeMove(initial, dest, out, in);
+       
+         } else if (player == LV1) {
+           pair<pair<int,int>,pair<int,int>> move = generateLV1Move(turn);
+           makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
+         } else if (player == LV2) {
+            pair<pair<int,int>,pair<int,int>> move = generateLV2Move(turn);
+           makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
+         }
+           print(out);
+        }
+         else if (cmd == "resign") {
+            resign(cout);
+            break;
+        }
+    }
+}
+
 void Controller::makeMove(string initial, string dest, ostream &out, istream &in)
 {
     int row = translateMove(initial).first;
@@ -255,13 +497,113 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
         out << "No Piece there" << endl;
     }
     if (checkForCheckMate(out))
-    {
+    { 
+        gameNotDone = false;
     }
     else if (checkForCheck(out))
     {
+  
     }
     else if (checkForStaleMate(out))
     {
+        gameNotDone = false;
+    }
+}
+
+void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out, istream &in)
+{
+    b.refreshLegalMoves();
+    filterValidMoves();
+
+    ChessPiece *tmp = b.getSquare(row, col)->getPiece();
+
+    if (tmp) // checking if there is a piece on that square
+    {
+        if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
+        {
+
+            if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'p' && newRow == 7)
+            {
+                char newPiece = 'q';
+                
+                if (newPiece != 'k')
+                {
+                    b.getSquare(row, col)->setPiece(translate(newPiece));
+                    b.makeMove(row, col, newRow, newCol);
+                    toggleTurn();
+                }
+            }
+            else if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'P' && newRow == 0)
+            {
+                char newPiece = 'Q';
+                
+                if (newPiece != 'K')
+                {
+                    b.getSquare(row, col)->setPiece(translate(newPiece));
+                    b.makeMove(row, col, newRow, newCol);
+                    toggleTurn();
+                    b.refreshForEnPassant(turn);
+                }
+            }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col + 2 == newCol) {
+                b.makeMove(row,col,newRow,newCol);
+                b.makeMove(row, b.boardDim-1,newRow,col+1);
+                toggleTurn();
+                b.refreshForEnPassant(turn);
+            } 
+            else if (b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col - 2 == newCol) {
+                b.makeMove(row,col,newRow,newCol);
+                b.makeMove(row, 0,newRow,col-1);
+                toggleTurn();
+                b.refreshForEnPassant(turn);
+            }
+            else
+            {
+                bool enPassant = false;
+                ChessPiece *ourPawn = b.getSquare(row, col)->getPiece();
+                
+                for(auto n: *ourPawn->getValidMoves()){
+                    if(n.type == ENPASSANT && n.x == newRow && n.y == newCol) {
+                        enPassant = true;
+                    }
+                }
+
+                if(!enPassant){
+                    b.makeMove(row, col, newRow, newCol);
+                    toggleTurn();
+                    b.refreshForEnPassant(turn);
+                }else{
+                    b.makeMove(row, col, newRow, newCol);
+                    b.getSquare(row, newCol)->setPiece(nullptr);
+                    toggleTurn();
+                    b.refreshForEnPassant(turn);
+                }
+            }
+
+            b.refreshLegalMoves();
+            filterValidMoves();
+            
+        }
+        else
+        {
+            out << "Illegal Move" << endl;
+        }
+    }
+    else
+    {
+        out << "No Piece there" << endl;
+    }
+    if (checkForCheckMate(out))
+    {
+        gameNotDone = false;
+
+    }
+    else if (checkForCheck(out))
+    {
+
+    }
+    else if (checkForStaleMate(out))
+    { 
+        gameNotDone = false;
     }
 }
 
@@ -428,23 +770,7 @@ bool Controller::checkForCheck(ostream &out)
     return false;
 }
 
-void Controller::makeMove(int x, int y, int newx, int newY)
-{
-    b.refreshLegalMoves();
 
-    ChessPiece *tmp = b.getSquare(x, y)->getPiece();
-
-    if (tmp) // checking if there is a piece on that square
-    {
-
-        if (tmp->isLegalMove(newx, newY, turn)) // checking if the move is legal
-        {
-            b.makeMove(x, y, newx, newY);
-            b.refreshLegalMoves();
-            toggleTurn();
-        }
-    }
-}
 
 bool Controller::checkForCheckMate(ostream &out)
 {
@@ -487,3 +813,139 @@ void Controller::resign(ostream &out) {
        out << "White resigned. Black wins!" << endl; 
     }
 }
+
+pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
+  vector <Square *> &pieces = whitePieces;
+  
+  b.refreshLegalMoves();
+  filterValidMoves();
+
+  if (c == Black) 
+  { pieces = blackPieces;
+  } 
+  
+ 
+
+    pieces.clear();
+
+    for (int i = 0; i < b.boardDim; ++i) {
+        for (int j = 0; j <b.boardDim; ++j) {
+            Square *tmp = b.getSquare(i,j);
+            if(tmp->getPiece() && (tmp->getPiece()->getColour() == c)&& (*tmp->getPiece()->getValidMoves()).size() != 0) {
+                cout <<"ft"<< i << j << endl;
+                pieces.emplace_back(tmp);
+            }
+        }
+    }
+ 
+    srand(time(NULL));
+    int random = rand()%pieces.size();
+
+    Square * randomSquare = pieces.at(random);
+    
+    auto moves = *(randomSquare->getPiece()->getValidMoves());
+    
+    srand(time(NULL));
+    int random2 = rand()%moves.size(); //maybe messing up moving out of check
+
+    Move randomMove = moves.at(random2);
+
+   return {{randomSquare->getX(), randomSquare->getY()}, {randomMove.x, randomMove.y}};
+
+} 
+
+
+pair<pair<int,int>,pair<int,int>> Controller:: generateLV2Move(Colour c) {
+vector <Square *> &pieces = whitePieces;
+
+ b.refreshLegalMoves();
+  filterValidMoves(); 
+
+  if (c == Black) 
+  { pieces = blackPieces;
+  } 
+
+
+
+    pieces.clear();
+
+    bool noCheckingMove = true;
+
+    bool noCapturingMove = true;
+
+    int x,y,newX,newY;
+        
+       for (int i = 0 ; i < b.boardDim; ++i) {
+        for (int j = 0; j <b.boardDim; ++j) {
+            Square *tmp = b.getSquare(i,j);
+            if(tmp->getPiece() && tmp->getPiece()->getColour() == c && (*tmp->getPiece()->getValidMoves()).size() != 0) {
+                pieces.emplace_back(tmp);
+            }
+        }
+    }
+
+    for(auto square: pieces) {
+       auto m = *(square->getPiece()->getValidMoves());
+        for (auto move : m) {
+             if(checksOtherPlayer(square->getX(), square->getY(), move.x, move.y)) {
+                noCheckingMove = false;
+                noCapturingMove = false;
+                x = square->getX();
+                y = square->getY();
+                newX = move.x;
+                newY = move.y;
+             }
+        }
+     }
+
+       if (noCheckingMove) {
+        for(auto square: pieces) {
+            auto m = *(square->getPiece()->getValidMoves());
+        for (auto move : m) {
+             if(move.type == CAPTURING) {
+                noCapturingMove = false;
+                x = square->getX();
+                y = square->getY();
+                newX = move.x;
+                newY = move.y;
+             }
+        }
+     }
+     }
+
+     if (noCheckingMove && noCapturingMove) {
+       return generateLV1Move(c);
+     }
+
+     return {{x, y}, {newX, newY}};
+
+}
+
+
+pair<pair<int,int>,pair<int,int>> Controller:: generateLV3Move(Colour c) {
+  vector <Square *> &pieces = whitePieces;
+
+  if (c == Black) 
+  { pieces = blackPieces;
+  } 
+
+
+
+
+}
+
+PlayerType Controller::translatePlayer(string player) {
+    if (player == "human") {
+        return Human;
+    } else if (player == "computer1") {
+        return LV1;
+    } else if (player == "computer2") {
+        return LV2;
+    } else {
+        return LV3;
+    }
+}
+
+
+
+

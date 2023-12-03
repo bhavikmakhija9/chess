@@ -164,7 +164,7 @@ void Board::refreshLegalMoves()
 }
 
 void Board::defBoard()
-{
+{   
     Colour col = White;
     board.resize(boardDim, vector<Square>(boardDim, Square()));
     for (int i = 0; i < boardDim; i++)

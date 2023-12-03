@@ -13,7 +13,8 @@ void ChessPiece::deleteMove(int newx, int newy)
     for (int i = 0; i < validMoves.size(); ++i)
     {
         if (validMoves.at(i).x == newx && validMoves.at(i).y == newy)
-        {
+        {   
+            cout <<"deleting moves : " << getPieceChar() << newx << newy << endl;
             validMoves.erase(validMoves.begin() + i);
         }
     }
@@ -30,9 +31,9 @@ bool ChessPiece::isLegalMove(int newx, int newy, Colour turn)
 
     for (auto n : validMoves)
     {
+        cout <<"valid moves : " << getPieceChar() << n.x << n.y <<endl;
         if (newx == n.x && newy == n.y)
         {
-
             return true;
         }
     }
