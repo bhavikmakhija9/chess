@@ -298,15 +298,7 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
     int newRow = translateMove(dest).first;
     int newCol = translateMove(dest).second;
    
-   makeMove(row,col,newRow,newCol,out,in);
-}
-
-void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out, istream &in)
-{
-    b.refreshLegalMoves();
-    filterValidMoves();
-    
-    ChessPiece *tmp = b.getSquare(row, col)->getPiece();
+   ChessPiece *tmp = b.getSquare(row, col)->getPiece();
 
     if (tmp) // checking if there is a piece on that square
     {
@@ -347,6 +339,101 @@ void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out
                     toggleTurn();
                     b.refreshForEnPassant(turn);
                 }
+            }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col + 2 == newCol) {
+                b.makeMove(row,col,newRow,newCol);
+                b.makeMove(row, b.boardDim-1,newRow,col+1);
+                toggleTurn();
+                b.refreshForEnPassant(turn);
+            } 
+            else if (b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col - 2 == newCol) {
+                b.makeMove(row,col,newRow,newCol);
+                b.makeMove(row, 0,newRow,col-1);
+                toggleTurn();
+                b.refreshForEnPassant(turn);
+            }
+            else
+            {
+                bool enPassant = false;
+                ChessPiece *ourPawn = b.getSquare(row, col)->getPiece();
+                
+                for(auto n: *ourPawn->getValidMoves()){
+                    if(n.type == ENPASSANT && n.x == newRow && n.y == newCol) {
+                        enPassant = true;
+                    }
+                }
+
+                if(!enPassant){
+                    b.makeMove(row, col, newRow, newCol);
+                    toggleTurn();
+                    b.refreshForEnPassant(turn);
+                }else{
+                    b.makeMove(row, col, newRow, newCol);
+                    b.getSquare(row, newCol)->setPiece(nullptr);
+                    toggleTurn();
+                    b.refreshForEnPassant(turn);
+                }
+            }
+
+            b.refreshLegalMoves();
+            filterValidMoves();
+            
+        }
+        else
+        {
+            out << "Illegal Move" << endl;
+        }
+    }
+    else
+    {
+        out << "No Piece there" << endl;
+    }
+    if (checkForCheckMate(out))
+    { 
+        gameNotDone = false;
+    }
+    else if (checkForCheck(out))
+    {
+  
+    }
+    else if (checkForStaleMate(out))
+    {
+        gameNotDone = false;
+    }
+}
+
+void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out, istream &in)
+{
+    b.refreshLegalMoves();
+    filterValidMoves();
+    
+    ChessPiece *tmp = b.getSquare(row, col)->getPiece();
+
+    if (tmp) // checking if there is a piece on that square
+    {
+        for (auto n : *tmp->getValidMoves()) {
+
+        }
+        if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
+        {
+
+            if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'p' && newRow == b.boardDim-1)
+            {
+              
+                
+                    b.getSquare(row, col)->setPiece(translate('q'));
+                    b.makeMove(row, col, newRow, newCol);
+                    toggleTurn();
+                    b.refreshForEnPassant(turn);
+                }
+            
+            else if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'P' && newRow == 0)
+            {
+                
+                    b.getSquare(row, col)->setPiece(translate('Q'));
+                    b.makeMove(row, col, newRow, newCol);
+                    toggleTurn();
+                    b.refreshForEnPassant(turn);
+                
             }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col + 2 == newCol) {
                 b.makeMove(row,col,newRow,newCol);
                 b.makeMove(row, b.boardDim-1,newRow,col+1);
@@ -631,15 +718,19 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
     pieces.clear();
 
     for (int i = 0; i < b.boardDim; ++i) {
+             b.refreshLegalMoves();
+              filterValidMoves();
         for (int j = 0; j <b.boardDim; ++j) {
             Square *tmp = b.getSquare(i,j);
-            if(tmp->getPiece() && (tmp->getPiece()->getColour() == c)&& (*tmp->getPiece()->getValidMoves()).size() != 0) {
+               
+            if(tmp->getPiece() && (tmp->getPiece()->getColour() == c) && (*tmp->getPiece()->getValidMoves()).size() != 0) {
                 cout <<"ft"<< i << j << endl;
                 pieces.emplace_back(tmp);
             }
         }
     }
- 
+  
+    
     srand(time(NULL));
     int random = rand()%pieces.size();
 
@@ -647,10 +738,12 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
     
     auto moves = *(randomSquare->getPiece()->getValidMoves());
     
-    srand(time(NULL));
+    //srand(time(NULL));
     int random2 = rand()%moves.size(); //maybe messing up moving out of check
 
     Move randomMove = moves.at(random2);
+
+    cout << "tried:" << randomSquare->getX() << randomSquare->getY() << randomMove.x <<randomMove.y <<endl;
 
    return {{randomSquare->getX(), randomSquare->getY()}, {randomMove.x, randomMove.y}};
 
@@ -687,6 +780,8 @@ vector <Square *> &pieces = whitePieces;
     }
 
     for(auto square: pieces) {
+          b.refreshLegalMoves();
+          filterValidMoves();
        auto m = *(square->getPiece()->getValidMoves());
         for (auto move : m) {
              if(checksOtherPlayer(square->getX(), square->getY(), move.x, move.y)) {
@@ -702,9 +797,11 @@ vector <Square *> &pieces = whitePieces;
 
        if (noCheckingMove) {
         for(auto square: pieces) {
+              b.refreshLegalMoves();
+                filterValidMoves();
             auto m = *(square->getPiece()->getValidMoves());
         for (auto move : m) {
-             if(move.type == CAPTURING) {
+             if(move.type == CAPTURING || move.type == ENPASSANT) {
                 noCapturingMove = false;
                 x = square->getX();
                 y = square->getY();

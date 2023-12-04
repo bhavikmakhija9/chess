@@ -194,6 +194,7 @@ void Board::defBoard()
         {
             board[i][j].setCoords(i, j);
             board[i][j].setColour(col);
+            if(j != boardDim - 1){
             if (col == Colour::White)
             {
                 col = Colour::Black;
@@ -201,7 +202,7 @@ void Board::defBoard()
             else
             {
                 col = Colour::White;
-            }
+            }}
         }
     }
 }
