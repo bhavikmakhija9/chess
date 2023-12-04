@@ -362,6 +362,8 @@ void Controller::startGame(std::istream &in, std::ostream &out) {
 
     blackPlayer = translatePlayer(player2);
 
+    b.defBoard();
+
     while (in >> cmd && gameNotDone) {
         if (cmd == "move")
         {
