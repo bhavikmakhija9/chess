@@ -6,7 +6,7 @@
 #include <utility>
 #include <random>
 
-enum PlayerType{Human, LV1, LV2, LV3};
+enum PlayerType{Human, LV1, LV2, LV3, LV4};
 
 class Controller
 {   PlayerType whitePlayer;
@@ -35,6 +35,7 @@ class Controller
     pair<pair<int,int>,pair<int,int>> generateLV1Move(Colour c);
     pair<pair<int,int>,pair<int,int>> generateLV2Move(Colour c);
     pair<pair<int,int>,pair<int,int>> generateLV3Move(Colour c);
+    pair<pair<int,int>,pair<int,int>> generateLV4Move(Colour c);
     
     public:
         Controller();

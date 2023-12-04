@@ -382,6 +382,9 @@ void Controller::startGame(std::istream &in, std::ostream &out) {
          }else if (player == LV3){
             pair<pair<int,int>,pair<int,int>> move = generateLV3Move(turn);
            makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
+         }else if (player == LV4){
+            pair<pair<int,int>,pair<int,int>> move = generateLV4Move(turn);
+            makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
          }
            print(out);
         }
@@ -1072,6 +1075,133 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV3Move(Colour c) {
 
 }
 
+pair<pair<int,int>,pair<int,int>> Controller:: generateLV4Move(Colour c) {
+    vector <Square *> &pieces = whitePieces;
+    vector <Square *> &enemyPieces = blackPieces;
+  
+    b.refreshLegalMoves();
+    filterValidMoves(); 
+
+    if (c == Black) 
+    { 
+        enemyPieces = whitePieces;
+        pieces = blackPieces;
+    } 
+
+    pieces.clear();
+    enemyPieces.clear();
+
+    for (int i = 0 ; i < b.boardDim; ++i) {
+        for (int j = 0; j <b.boardDim; ++j) {
+            Square *tmp = b.getSquare(i,j);
+            if(tmp->getPiece() && tmp->getPiece()->getColour() == c && (*tmp->getPiece()->getValidMoves()).size() != 0) {
+                pieces.emplace_back(tmp);
+            }
+            if(tmp->getPiece() && tmp->getPiece()->getColour() != c && (*tmp->getPiece()->getValidMoves()).size() != 0) {
+                enemyPieces.emplace_back(tmp);
+            }
+        }
+    } //have updated values for where pieces are
+
+    int x, y, newX, newY;
+
+    vector <Square *> gettingAttacked;
+
+    for(auto square: pieces) {
+        b.refreshLegalMoves();
+        filterValidMoves();
+        auto m = *(square->getPiece()->getValidMoves());
+        for (auto move : m) {
+             if(checksOtherPlayer(square->getX(), square->getY(), move.x, move.y) 
+                    && !canBeCaptured(square->getX(), square->getY(), move.x, move.y, enemyPieces)) {
+                x = square->getX();
+                y = square->getY();
+                newX = move.x;
+                newY = move.y;
+                return {{x, y}, {newX, newY}};
+             }
+        }
+     } //likes the idea of safe checking
+
+     for(auto square: pieces) {
+              b.refreshLegalMoves();
+                filterValidMoves();
+            auto m = *(square->getPiece()->getValidMoves());
+            for (auto move : m) {
+                if((move.type == CAPTURING || move.type == ENPASSANT) && !canBeCaptured(square->getX(), square->getY(), move.x, move.y, enemyPieces)) {
+                x = square->getX();
+                y = square->getY();
+                newX = move.x;
+                newY = move.y;
+                return {{x, y}, {newX, newY}};
+             }
+        }
+     } //likes the idea of safe capturing
+
+    for(auto square: pieces) {
+              b.refreshLegalMoves();
+                filterValidMoves();
+            auto m = *(square->getPiece()->getValidMoves());
+            for (auto move : m) { //added bounce check here idk why but seems like its needed
+                x = square->getX();
+                y = square->getY();
+                newX = move.x;
+                newY = move.y;
+                if((move.type == CAPTURING || move.type == ENPASSANT) && (newX >= 0 && newX < b.boardDim-1) && (newY >= 0 && newY < b.boardDim-1) &&
+                    (b.getSquare(newX,newY)->getPiece()->getValue() >= b.getSquare(x,y)->getPiece()->getValue())) {
+                return {{x, y}, {newX, newY}};
+             }
+        }
+     } //likes the idea of trading similar or better material
+
+    for(auto n : pieces){
+        if (isUnderAttack(n, enemyPieces)) gettingAttacked.emplace_back(n);
+    }
+
+    if (gettingAttacked.size() != 0) {
+        for (auto square: gettingAttacked) {
+            b.refreshLegalMoves();
+            filterValidMoves();
+            auto m = *(square->getPiece()->getValidMoves());
+            for (auto move : m) {
+                if (!canBeCaptured(square->getX(), square->getY(), move.x, move.y, enemyPieces)) {
+                    x = square->getX();
+                    y = square->getY();
+                    newX = move.x;
+                    newY = move.y;
+                    return {{x, y}, {newX, newY}};
+                }
+            }
+        }
+    } //likes the idea of not protecting material
+
+    vector <pair<pair<int,int>,pair<int,int>>> safeMoves; //this vector keeps track of all moves
+
+    for (auto square: pieces) {
+            auto m = *(square->getPiece()->getValidMoves());
+            b.refreshLegalMoves();
+            filterValidMoves();
+            for (auto move : m) {
+                if (!canBeCaptured(square->getX(), square->getY(), move.x, move.y, enemyPieces)) {
+                    x = square->getX();
+                    y = square->getY();
+                    newX = move.x;
+                    newY = move.y;
+                    pair<pair<int,int>,pair<int,int>> aMove = {{x, y}, {newX, newY}};
+                    safeMoves.emplace_back(aMove);
+                }
+            }
+        } //rather make a safe move than a dumb move
+
+        if(safeMoves.size() != 0){
+            srand(time(NULL));
+            int random = rand()%safeMoves.size();
+            return safeMoves[random];
+        }
+
+    return generateLV1Move(c); //found no good moves so might as well move randomly
+}
+
 PlayerType Controller::translatePlayer(string player) {
     if (player == "human") {
         return Human;
@@ -1081,9 +1211,7 @@ PlayerType Controller::translatePlayer(string player) {
         return LV2;
     } else if (player == "computer3"){
         return LV3;
+    } else if (player == "computer4"){
+        return LV4;
     }
 }
-
-
-
-
