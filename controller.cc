@@ -362,9 +362,11 @@ void Controller::startGame(std::istream &in, std::ostream &out) {
 
     blackPlayer = translatePlayer(player2);
 
-    b.defBoard();
-    b.refreshLegalMoves();
-    b.notifyObservers();
+    if (!setupMode) {
+        b.defBoard();
+        b.refreshLegalMoves();
+        b.notifyObservers();
+    }
     print(out);
 
     while (in >> cmd && gameNotDone) {
@@ -503,8 +505,9 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
     { 
         gameNotDone = false;
             if (turn == Black) {
-        turn == White;
-    }
+            turn == White;
+        }
+        setupMode = false;
         
     }
     else if (checkForCheck(out))
@@ -515,8 +518,9 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
     {
         gameNotDone = false;
         if (turn == Black) {
-        turn == White;
-    }
+            turn == White;
+        }
+        setupMode = false;
     }
 }
 
@@ -605,6 +609,7 @@ void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out
     if (checkForCheckMate(out))
     { 
         gameNotDone = false;
+        setupMode = false;
     }
     else if (checkForCheck(out))
     {
@@ -613,6 +618,7 @@ void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out
     else if (checkForStaleMate(out))
     {
         gameNotDone = false;
+        setupMode = false;
     }
 }
 
@@ -667,6 +673,7 @@ void Controller::setup(std::istream &in, std::ostream &out)
 {
 
     turn = Colour::White;
+    setupMode = true;
     b.emptyBoard();
     string cmd;
     while (in >> cmd)
@@ -678,6 +685,7 @@ void Controller::setup(std::istream &in, std::ostream &out)
             cin >> piece >> loc;
             auto coords = translateMove(loc);
             b.getSquare(coords.first, coords.second)->setPiece(translate(piece));
+            b.notifyObservers();
         }
         else if (cmd == "-")
         {
@@ -686,6 +694,7 @@ void Controller::setup(std::istream &in, std::ostream &out)
             auto coords = translateMove(loc);
 
             b.getSquare(coords.first, coords.second)->clearSquare();
+            b.notifyObservers();
         }
 
         else if (cmd == "=")
@@ -834,7 +843,7 @@ bool Controller::checkForStaleMate(ostream &out)
     pair<int, int> knights {0, 0};
     
     for (int i = 0; i < b.boardDim; i++) {
-        for (int j; j < b.boardDim; j++) {
+        for (int j = 0; j < b.boardDim; j++) {
             ChessPiece *temp = b.getSquare(i, j)->getPiece();
             if (temp) {
                 switch (temp->getType()) {
@@ -848,7 +857,7 @@ bool Controller::checkForStaleMate(ostream &out)
                         (temp->getColour()) ? ++queens.first : ++queens.second;
                         break;
                     case KNIGHT:
-                        (temp->getColour()) ? ++queens.first : ++queens.second;
+                        (temp->getColour()) ? ++knights.first : ++knights.second;
                         break;
                     case BISHOP:
                         (temp->getColour()) ? ++bishops.first : ++bishops.second;
@@ -861,17 +870,16 @@ bool Controller::checkForStaleMate(ostream &out)
         }
     }
 
-    std::cout << (pawns.first == 0) << (pawns.second == 0) << endl;
-    std::cout << (bishops.first == 0) <<( bishops.second  == 0) << endl;
+    std::cout << pawns.first << pawns.second << endl;
+    std::cout << bishops.first << bishops.second << endl;
+    std::cout << bishopSquareCol.first << bishopSquareCol.second << endl;
     std::cout << knights.first << knights.second << endl;
     std::cout << rooks.first << rooks.second << endl;
     std::cout << queens.first << queens.second << endl;
 
     if (rooks.first == 0 && rooks.second == 0 && queens.first == 0 && queens.second == 0 && pawns.first == 0 && pawns.second == 0) {
-        cout << "Im here" << endl;
         if (bishops.first == 0 && bishops.second == 0 && knights.first == 0 && knights.second == 0) {
                 // Case for king vs king
-                cout << "Im here" << endl;
                 insufficientPieces = true;
         } else if (((bishops.first == 1 && bishops.second == 0) || (bishops.first == 0 && bishops.second == 1)) 
                     && knights.first == 0 && knights.second == 0) {
@@ -886,7 +894,8 @@ bool Controller::checkForStaleMate(ostream &out)
                         // case for king and two knight vs king
                         insufficientPieces = true;
         } else if (knights.first == 0 && knights.second == 0 && bishops.first == 1 && bishops.second == 1 
-                    && bishopSquareCol.first == bishopSquareCol.second) {
+                    && ((bishopSquareCol.first == 2 && bishopSquareCol.second == 0) || 
+                        (bishopSquareCol.first == 0 && bishopSquareCol.second == 2))) {
                         // case for king and bishop vs king and bishop on same colour square
                         insufficientPieces = true;
 
@@ -908,6 +917,7 @@ void Controller::resign(ostream &out) {
        out << "White resigned. Black wins!" << endl; 
        blackWins++;
     }
+    setupMode = false;
 }
 
 pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {

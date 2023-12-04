@@ -13,6 +13,7 @@ class Controller
     PlayerType blackPlayer;
     Board b;
     bool gameNotDone = true;
+    bool setupMode = false;
     TextDisplay *td;
     GraphicsDisplay *gd;
     float whiteWins=0;
