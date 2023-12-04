@@ -1,5 +1,6 @@
 #include <vector>
 #include "board.h"
+#include "window.h"
 
 using namespace std;
 
@@ -94,3 +95,25 @@ ostream &operator<<(ostream &out, const TextDisplay &td)
     out << "\n";
     return out;
 }
+
+
+GraphicsDisplay::GraphicsDisplay(Xwindow &xw) : xw(xw) {
+ 
+
+ int colour = 1;
+
+for (int i=0; i < 800; i+=100) {
+    for (int j = 0; j < 800; j+=100) {
+        xw.fillRectangle(i,j,100,100,colour);
+        if (j != 700) {
+            if (colour == 1) {
+                colour = 0;
+            } else {
+                colour = 1;
+            }
+        }
+    }
+ }
+}
+
+ GraphicsDisplay::~GraphicsDisplay() {}
