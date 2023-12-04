@@ -49,5 +49,6 @@ public:
     Square *getSquare(int x, int y);
     bool isChecked(Colour c);
     bool hasNoMoves(Colour c);
+    void notifyObservers();
 };
 #endif

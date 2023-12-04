@@ -4,8 +4,9 @@
 using namespace std;
 
 int main()
-{
-    Controller control;
+{   
+    Xwindow w;
+    Controller control(w);
 
     string cmd, initial, dest;
 

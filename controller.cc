@@ -3,11 +3,12 @@
 
 using namespace std;
 
-Controller::Controller() : td(new TextDisplay), turn(White)
+Controller::Controller(Xwindow &w) : gd(new GraphicsDisplay(w)) , td(new TextDisplay), turn(White)
 {
     b.defBoard();
     b.refreshLegalMoves();
     b.attachDisplay(td);
+    b.attachDisplay(gd);
 }
 
 std::pair<int, int> Controller::translateMove(string str)
@@ -480,6 +481,7 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
 
             b.refreshLegalMoves();
             filterValidMoves();
+            b.notifyObservers();
             
         }
         else
@@ -575,6 +577,7 @@ void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out
 
             b.refreshLegalMoves();
             filterValidMoves();
+            b.notifyObservers();
             
         }
         else
@@ -771,13 +774,13 @@ bool Controller::checkForCheckMate(ostream &out)
 {
     if (b.isChecked(Black) && b.hasNoMoves(Black))
     {
-        out << "White Wins" << endl;
+        out << "Checkmate!White Wins" << endl;
         return true;
     }
 
     if (b.isChecked(White) && b.hasNoMoves(White))
     {
-        out << "Black Wins" << endl;
+        out << "Checkmate!Black Wins" << endl;
         return true;
     }
 
@@ -902,7 +905,6 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
             Square *tmp = b.getSquare(i,j);
                
             if(tmp->getPiece() && (tmp->getPiece()->getColour() == c) && (*tmp->getPiece()->getValidMoves()).size() != 0) {
-                cout <<"ft"<< i << j << endl;
                 pieces.emplace_back(tmp);
             }
         }
@@ -920,8 +922,6 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
     int random2 = rand()%moves.size(); //maybe messing up moving out of check
 
     Move randomMove = moves.at(random2);
-
-    cout << "tried:" << randomSquare->getX() << randomSquare->getY() << randomMove.x <<randomMove.y <<endl;
 
    return {{randomSquare->getX(), randomSquare->getY()}, {randomMove.x, randomMove.y}};
 
