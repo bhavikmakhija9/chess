@@ -10,8 +10,6 @@ int main()
 
     string cmd, initial, dest;
 
-    control.print(cout);
-
     while (cin >> cmd)
     {
 
@@ -28,4 +26,10 @@ int main()
             cout << "Invalid Command. Try Again" << endl;
         } 
     }
+
+    
+        cout << "Final Score: " << endl;
+        cout << "White: " << control.getWhiteWins()  << endl;
+        cout << "Black: " << control.getBlackWins()  << endl;
+    
 }

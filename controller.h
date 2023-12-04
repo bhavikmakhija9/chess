@@ -15,6 +15,8 @@ class Controller
     bool gameNotDone = true;
     TextDisplay *td;
     GraphicsDisplay *gd;
+    float whiteWins=0;
+    float blackWins=0;
     vector <Square *> blackPieces;
     vector <Square *> whitePieces;
     ChessPiece *translate(char c); //turns a character into the corresponding ChessPiece
@@ -22,6 +24,7 @@ class Controller
     Colour turn;
     std::pair<int, int> translateMove(string str); //translates move from chess board notation to grid notation
     void toggleTurn();
+    void print(std::ostream &out) const;
     void filterValidMoves();
     bool isValidCheckMove(int x, int y, int newx, int newY);
     bool checkForCheck(std::ostream &out);
@@ -45,6 +48,9 @@ class Controller
         
         void startGame(std::istream &in, std::ostream &out);
 
-        void print(std::ostream &out) const;
+        float getWhiteWins();
+
+        float getBlackWins();
+
 };
 #endif

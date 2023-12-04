@@ -363,6 +363,9 @@ void Controller::startGame(std::istream &in, std::ostream &out) {
     blackPlayer = translatePlayer(player2);
 
     b.defBoard();
+    b.refreshLegalMoves();
+    b.notifyObservers();
+    print(out);
 
     while (in >> cmd && gameNotDone) {
         if (cmd == "move")
@@ -392,6 +395,7 @@ void Controller::startGame(std::istream &in, std::ostream &out) {
            print(out);
         }
          else if (cmd == "resign") {
+            
             resign(cout);
             break;
         }
@@ -498,6 +502,10 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
     if (checkForCheckMate(out))
     { 
         gameNotDone = false;
+            if (turn == Black) {
+        turn == White;
+    }
+        
     }
     else if (checkForCheck(out))
     {
@@ -506,6 +514,9 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
     else if (checkForStaleMate(out))
     {
         gameNotDone = false;
+        if (turn == Black) {
+        turn == White;
+    }
     }
 }
 
@@ -777,14 +788,19 @@ bool Controller::checkForCheckMate(ostream &out)
     if (b.isChecked(Black) && b.hasNoMoves(Black))
     {
         out << "Checkmate!White Wins" << endl;
+        whiteWins++;
         return true;
     }
 
     if (b.isChecked(White) && b.hasNoMoves(White))
     {
         out << "Checkmate!Black Wins" << endl;
+        blackWins++;
+     
         return true;
     }
+
+    
 
     return false;
 }
@@ -794,14 +810,19 @@ bool Controller::checkForStaleMate(ostream &out)
     if (!b.isChecked(Black) && b.hasNoMoves(Black))
     {
         out << "Stalemate!" << endl;
+        whiteWins+=0.5;
+        blackWins+=0.5;
         return true;
     }
 
     if (!b.isChecked(White) && b.hasNoMoves(White))
     {
         out << "Stalemate!" << endl;
+        whiteWins+=0.5;
+        blackWins+=0.5;
         return true;
     }
+
 
 
     bool insufficientPieces = false;
@@ -881,8 +902,11 @@ bool Controller::checkForStaleMate(ostream &out)
 void Controller::resign(ostream &out) {
     if (turn == Black) {
         out << "Black resigned. White wins!" << endl;
+        whiteWins++;
+        turn = White;
     } else {
        out << "White resigned. Black wins!" << endl; 
+       blackWins++;
     }
 }
 
@@ -1217,3 +1241,11 @@ PlayerType Controller::translatePlayer(string player) {
         return LV4;
     }
 }
+
+ float Controller::getWhiteWins() {
+    return whiteWins;
+ }
+
+  float Controller::getBlackWins() {
+    return blackWins;
+ }

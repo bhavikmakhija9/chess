@@ -187,6 +187,12 @@ void Board::defBoard()
         }
         else if (i == 7)
             setWarFormationRows(i, Colour::White);
+        else {
+            for (int j = 0; j < boardDim; j++)
+            {
+                board[i][j].setPiece(nullptr);
+            }
+        }
 
         // Set coords of the row
         for (int j = 0; j < boardDim; j++)
