@@ -826,72 +826,72 @@ bool Controller::checkForStaleMate(ostream &out)
 
 
     bool insufficientPieces = false;
-    // pair<int, int> bishops {0, 0};
-    // pair<int, int> bishopSquareCol {0, 0};
-    // pair<int, int> rooks {0, 0};
-    // pair<int, int> queens {0, 0};
-    // pair<int, int> pawns {0, 0};
-    // pair<int, int> knights {0, 0};
+    pair<int, int> bishops {0, 0};
+    pair<int, int> bishopSquareCol {0, 0};
+    pair<int, int> rooks {0, 0};
+    pair<int, int> queens {0, 0};
+    pair<int, int> pawns {0, 0};
+    pair<int, int> knights {0, 0};
     
-    // for (int i = 0; i < b.boardDim; i++) {
-    //     for (int j; j < b.boardDim; j++) {
-    //         ChessPiece *temp = b.getSquare(i, j)->getPiece();
-    //         if (temp) {
-    //             switch (temp->getType()) {
-    //                 case PAWN:
-    //                     (temp->getColour()) ? ++pawns.first : ++pawns.second;
-    //                     break;
-    //                 case ROOK:
-    //                     (temp->getColour()) ? ++rooks.first : ++rooks.second;
-    //                     break;
-    //                 case QUEEN:
-    //                     (temp->getColour()) ? ++queens.first : ++queens.second;
-    //                     break;
-    //                 case KNIGHT:
-    //                     (temp->getColour()) ? ++queens.first : ++queens.second;
-    //                     break;
-    //                 case BISHOP:
-    //                     (temp->getColour()) ? ++bishops.first : ++bishops.second;
-    //                     (b.getSquare(i ,j)->getColour()) ? ++bishopSquareCol.first : ++bishopSquareCol.second;
-    //                     break;
-    //                 default:
-    //                     break;
-    //             }
-    //         }
-    //     }
-    // }
+    for (int i = 0; i < b.boardDim; i++) {
+        for (int j; j < b.boardDim; j++) {
+            ChessPiece *temp = b.getSquare(i, j)->getPiece();
+            if (temp) {
+                switch (temp->getType()) {
+                    case PAWN:
+                        (temp->getColour()) ? ++pawns.first : ++pawns.second;
+                        break;
+                    case ROOK:
+                        (temp->getColour()) ? ++rooks.first : ++rooks.second;
+                        break;
+                    case QUEEN:
+                        (temp->getColour()) ? ++queens.first : ++queens.second;
+                        break;
+                    case KNIGHT:
+                        (temp->getColour()) ? ++queens.first : ++queens.second;
+                        break;
+                    case BISHOP:
+                        (temp->getColour()) ? ++bishops.first : ++bishops.second;
+                        (b.getSquare(i ,j)->getColour()) ? ++bishopSquareCol.first : ++bishopSquareCol.second;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
 
-    // std::cout << (pawns.first == 0) << (pawns.second == 0) << endl;
-    // std::cout << (bishops.first == 0) <<( bishops.second  == 0) << endl;
-    // std::cout << knights.first << knights.second << endl;
-    // std::cout << rooks.first << rooks.second << endl;
-    // std::cout << queens.first << queens.second << endl;
+    std::cout << (pawns.first == 0) << (pawns.second == 0) << endl;
+    std::cout << (bishops.first == 0) <<( bishops.second  == 0) << endl;
+    std::cout << knights.first << knights.second << endl;
+    std::cout << rooks.first << rooks.second << endl;
+    std::cout << queens.first << queens.second << endl;
 
-    // if (rooks.first == 0 && rooks.second == 0 && queens.first == 0 && queens.second == 0 && pawns.first == 0 && pawns.second == 0) {
-    //     cout << "Im here" << endl;
-    //     if (bishops.first == 0 && bishops.second == 0 && knights.first == 0 && knights.second == 0) {
-    //             // Case for king vs king
-    //             cout << "Im here" << endl;
-    //             insufficientPieces = true;
-    //     } else if (((bishops.first == 1 && bishops.second == 0) || (bishops.first == 0 && bishops.second == 1)) 
-    //                 && knights.first == 0 && knights.second == 0) {
-    //                     // case for king and one bishop vs king
-    //                     insufficientPieces = true;
-    //     } else if (((knights.first == 1 && knights.second == 0) || (knights.first == 0 && knights.second == 1)) 
-    //                 && bishops.first == 0 && bishops.second == 0) {
-    //                     // case for king and one knight vs king
-    //                     insufficientPieces = true;
-    //     } else if (((knights.first == 2 && knights.second == 0) || (knights.first == 0 && knights.second == 2)) 
-    //                 && bishops.first == 0 && bishops.second == 0) {
-    //                     // case for king and two knight vs king
-    //                     insufficientPieces = true;
-    //     } else if (knights.first == 0 && knights.second == 0 && bishops.first == 1 && bishops.second == 1 
-    //                 && bishopSquareCol.first == bishopSquareCol.second) {
-    //                     // case for king and bishop vs king and bishop on same colour square
-    //                     insufficientPieces = true;
+    if (rooks.first == 0 && rooks.second == 0 && queens.first == 0 && queens.second == 0 && pawns.first == 0 && pawns.second == 0) {
+        cout << "Im here" << endl;
+        if (bishops.first == 0 && bishops.second == 0 && knights.first == 0 && knights.second == 0) {
+                // Case for king vs king
+                cout << "Im here" << endl;
+                insufficientPieces = true;
+        } else if (((bishops.first == 1 && bishops.second == 0) || (bishops.first == 0 && bishops.second == 1)) 
+                    && knights.first == 0 && knights.second == 0) {
+                        // case for king and one bishop vs king
+                        insufficientPieces = true;
+        } else if (((knights.first == 1 && knights.second == 0) || (knights.first == 0 && knights.second == 1)) 
+                    && bishops.first == 0 && bishops.second == 0) {
+                        // case for king and one knight vs king
+                        insufficientPieces = true;
+        } else if (((knights.first == 2 && knights.second == 0) || (knights.first == 0 && knights.second == 2)) 
+                    && bishops.first == 0 && bishops.second == 0) {
+                        // case for king and two knight vs king
+                        insufficientPieces = true;
+        } else if (knights.first == 0 && knights.second == 0 && bishops.first == 1 && bishops.second == 1 
+                    && bishopSquareCol.first == bishopSquareCol.second) {
+                        // case for king and bishop vs king and bishop on same colour square
+                        insufficientPieces = true;
 
-    //     }
-    // }
+        }
+    }
     if (insufficientPieces) {
         out << "Stalemate!" << endl;
     }
