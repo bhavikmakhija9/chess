@@ -12,22 +12,23 @@ class Controller
 {   PlayerType whitePlayer;
     PlayerType blackPlayer;
     Board b;
-    bool gameNotDone = true;
-    bool setupMode = false;
+    Colour turn;
     TextDisplay *td;
     GraphicsDisplay *gd;
+    bool gameNotDone = true;
+    bool setupMode = false;
     float whiteWins=0;
     float blackWins=0;
     vector <Square *> blackPieces;
     vector <Square *> whitePieces;
     ChessPiece *translate(char c); //turns a character into the corresponding ChessPiece
     PlayerType translatePlayer(string player);
-    Colour turn;
     std::pair<int, int> translateMove(string str); //translates move from chess board notation to grid notation
     void toggleTurn();
     void print(std::ostream &out) const;
     void filterValidMoves();
-    bool isValidCheckMove(int x, int y, int newx, int newY);
+    void simulateMoveForCheckOrCapture(int x, int y, int newx, int newy, Colour col, bool& start, vector <Square *> &enemyPieces);
+    bool isValidCheckMove(int x, int y, int newx, int newy);
     bool checkForCheck(std::ostream &out);
     bool checkForCheckMate(std::ostream &out);
     bool checkForStaleMate(ostream &out);
