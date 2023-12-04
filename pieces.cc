@@ -44,6 +44,8 @@ Pawn::Pawn(Colour c) : ChessPiece(c){};
 
 void Pawn::setMovedTwo(bool b) { justMovedTwo = b; }
 
+int Pawn::getValue() {return 1;}
+
 bool Pawn::getMovedTwo() { return justMovedTwo; }
 
 void Pawn::refreshLegalMoves(int x, int y, Board &b)
@@ -217,6 +219,8 @@ ChessPiece::~ChessPiece() {}
 
 Rook::Rook(Colour c) : ChessPiece(c), moved(false){};
 
+int Rook::getValue() {return 5;}
+
 void Rook::setMoved(bool b)
 {
     this->moved = b;
@@ -343,6 +347,9 @@ char Rook::getPieceChar()
 }
 
 Bishop::Bishop(Colour c) : ChessPiece(c){};
+
+int Bishop::getValue(){ return 3; }
+
 void Bishop::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
@@ -469,6 +476,8 @@ King::King(Colour c) : ChessPiece(c), moved(false){};
 
 void King::setMoved(bool b) { moved = b; }
 bool King::getMoved() { return moved; }
+
+int King::getValue() { return 15; } //It is the most important piece
 
 void King::refreshLegalMoves(int x, int y, Board &b)
 {
@@ -902,6 +911,9 @@ void Queen::refreshLegalMoves(int x, int y, Board &b)
     }
 }
 PieceType Queen::getType() { return PieceType::QUEEN; }
+
+int Queen::getValue() {return 8;}
+
 char Queen::getPieceChar()
 {
     if (getColour() == Colour::White)
@@ -915,6 +927,9 @@ char Queen::getPieceChar()
 }
 
 Knight::Knight(Colour c) : ChessPiece(c){};
+
+int Knight::getValue(){ return 3; }
+
 void Knight::refreshLegalMoves(int x, int y, Board &b)
 {
     validMoves.clear();
