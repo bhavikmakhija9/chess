@@ -1047,10 +1047,11 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV3Move(Colour c) {
             }
         }
     }else{
+    
         for (auto square: pieces) {
+            auto m = *(square->getPiece()->getValidMoves());
             b.refreshLegalMoves();
             filterValidMoves();
-            auto m = *(square->getPiece()->getValidMoves());
             for (auto move : m) {
                 if (!canBeCaptured(square->getX(), square->getY(), move.x, move.y, enemyPieces)) {
                     x = square->getX();
@@ -1063,7 +1064,7 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV3Move(Colour c) {
         }
     }
     
-    if (!noDefendingMoves) {
+    if (noDefendingMoves) {
         return generateLV2Move(c);
     }
 
