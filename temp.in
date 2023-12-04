@@ -1,0 +1,23 @@
+setup
++ r a8
++ b e8
++ p a7
++ b a6
++ R a1
++ P a2
++ N b1
++ B c1
++ P c2 
++ P c5 
++ p d7
++ p e7
++ k f7
++ b f8 
++ K e1
++ r h7
++ P g4
+= black
+done
+game computer2 human
+move h7 h1 
+move

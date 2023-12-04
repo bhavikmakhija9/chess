@@ -1,0 +1,9 @@
+setup
++ P e5
++ p d7
++ K h1
++ k h8
+= black
+done
+move d7 d5
+move e5 d6
