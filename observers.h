@@ -6,6 +6,8 @@
 
 class Square;
 
+
+
 class Observer
 {
 public:
@@ -21,21 +23,20 @@ public:
   TextDisplay();
 
   void notify(Square &s) override;
-
   ~TextDisplay();
-
   friend std::ostream &operator<<(std::ostream &out, const TextDisplay &td);
 };
 #endif
 
 
 class GraphicsDisplay : public Observer {
-    Xwindow& xw;
-    int gs = 800;
-    int ss = 100;
+    Xwindow& w;
+    int gs = 400;
+    int ss = 50;
 
     public:
     GraphicsDisplay(Xwindow& xw);
+    void notify(Square &s) override;
     ~GraphicsDisplay();
 };
 

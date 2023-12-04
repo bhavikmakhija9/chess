@@ -14,6 +14,7 @@ class Controller
     Board b;
     bool gameNotDone = true;
     TextDisplay *td;
+    GraphicsDisplay *gd;
     vector <Square *> blackPieces;
     vector <Square *> whitePieces;
     ChessPiece *translate(char c); //turns a character into the corresponding ChessPiece
@@ -35,7 +36,7 @@ class Controller
     pair<pair<int,int>,pair<int,int>> generateLV3Move(Colour c);
     
     public:
-        Controller();
+        Controller(Xwindow &w);
         
         void setup(std::istream &in, std::ostream &out);
         

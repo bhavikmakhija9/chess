@@ -25,6 +25,7 @@ Xwindow::Xwindow(int width, int height) {
         height,DefaultDepth(d,DefaultScreen(d)));
   gc = XCreateGC(d, pix, 0,(XGCValues *)0);
 
+
   XFlush(d);
   XFlush(d);
 
@@ -49,6 +50,8 @@ Xwindow::Xwindow(int width, int height) {
   hints.width = hints.base_width = hints.min_width = hints.max_width = width;
   XSetNormalHints(d, w, &hints);
 
+  XSetFont(d, gc, XLoadFont(d, "lucidasans-bolditalic-8"));
+
   XSynchronize(d,True);
 
   usleep(1000);
@@ -66,6 +69,5 @@ void Xwindow::fillRectangle(int x, int y, int width, int height, int colour) {
 }
 
 void Xwindow::drawString(int x, int y, string msg) {
-  XDrawImageString(d, w, DefaultGC(d, s), x, y, msg.c_str(), msg.length());
+  XDrawString(d, w, DefaultGC(d, s), x, y, msg.c_str(), msg.length());
 }
-

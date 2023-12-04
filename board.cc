@@ -53,7 +53,6 @@ void Square::clearSquare()
         delete cp;
     }
     cp = nullptr;
-    notifyAllObservers();
 }
 
 void Square::setCoords(int x, int y)
@@ -92,7 +91,6 @@ void Square::setPiece(ChessPiece *newCp)
     // }
     cp = newCp;
 
-    notifyAllObservers();
 }
 
 ChessPiece *Square::getPiece() { return cp; };
@@ -103,9 +101,10 @@ void Square::notifyAllObservers()
 {
     for (auto o : observers)
     {
-        o->notify(*this);
+            o->notify(*this);
     }
 }
+
 
 Square::~Square()
 {
@@ -164,7 +163,7 @@ void Board::refreshLegalMoves()
 }
 
 void Board::defBoard()
-{   
+{
     Colour col = White;
     board.resize(boardDim, vector<Square>(boardDim, Square()));
     for (int i = 0; i < boardDim; i++)
@@ -194,26 +193,32 @@ void Board::defBoard()
         {
             board[i][j].setCoords(i, j);
             board[i][j].setColour(col);
-            if(j != boardDim - 1){
-            if (col == Colour::White)
+            if (j != boardDim - 1)
             {
-                col = Colour::Black;
+                if (col == Colour::White)
+                {
+                    col = Colour::Black;
+                }
+                else
+                {
+                    col = Colour::White;
+                }
             }
-            else
-            {
-                col = Colour::White;
-            }}
         }
     }
 }
 
-void Board::refreshForEnPassant(Colour c) {
-    for(int i = 0; i<boardDim; ++i){
-        for(int j = 0; j < boardDim; ++j){
-            if (getSquare(i, j)->getPiece() && getSquare(i, j)->getPiece()->getType() == PAWN && getSquare(i, j)->getPiece()->getColour() == c) {
-                static_cast<Pawn*>(getSquare(i, j)->getPiece())->setMovedTwo(false);
+void Board::refreshForEnPassant(Colour c)
+{
+    for (int i = 0; i < boardDim; ++i)
+    {
+        for (int j = 0; j < boardDim; ++j)
+        {
+            if (getSquare(i, j)->getPiece() && getSquare(i, j)->getPiece()->getType() == PAWN && getSquare(i, j)->getPiece()->getColour() == c)
+            {
+                static_cast<Pawn *>(getSquare(i, j)->getPiece())->setMovedTwo(false);
                 break;
-            } 
+            }
         }
     }
 }
@@ -222,8 +227,8 @@ void Board::makeMove(int x, int y, int newx, int newy)
 {
 
     // For En Passant penis
-    // penis 
-    //refreshForEnPassant(getSquare(x, y)->getColour());
+    // penis
+    // refreshForEnPassant(getSquare(x, y)->getColour());
 
     // For Castling
     if (board[x][y].getPiece()->getType() == KING)
@@ -241,11 +246,13 @@ void Board::makeMove(int x, int y, int newx, int newy)
         {
             ptr->setMoved(true);
         }
-    } 
+    }
     // For En Passant
-    else if (board[x][y].getPiece()->getType() == PAWN) { 
+    else if (board[x][y].getPiece()->getType() == PAWN)
+    {
         Pawn *ptr = static_cast<Pawn *>(board[x][y].getPiece());
-        if (x + 2 == newx || x - 2 == newx) {
+        if (x + 2 == newx || x - 2 == newx)
+        {
             ptr->setMovedTwo(true);
         }
     }
@@ -256,13 +263,6 @@ void Board::makeMove(int x, int y, int newx, int newy)
 
     board[x][y].clearSquare();
 
-    for (int i = 0; i < boardDim; i++)
-    {
-        for (int j = 0; j < boardDim; j++)
-        {
-            board[i][j].notifyAllObservers();
-        }
-    }
 }
 
 void Board::attachDisplay(Observer *o)
@@ -288,6 +288,17 @@ void Board::emptyBoard()
         for (int j = 0; j < boardDim; j++)
         {
             board[i][j].clearSquare();
+        }
+    }
+}
+
+void Board::notifyObservers()
+{
+    for (int i = 0; i < boardDim; i++)
+    {
+        for (int j = 0; j < boardDim; j++)
+        {
+            board[i][j].notifyAllObservers();
         }
     }
 }
