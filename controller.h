@@ -27,6 +27,8 @@ class Controller
     bool checkForCheckMate(std::ostream &out);
     bool checkForStaleMate(ostream &out);
     bool checksOtherPlayer(int x, int y, int newx, int newy);
+    bool isUnderAttack(Square* piece, vector <Square *> &enemyPieces);
+    bool canBeCaptured(int x, int y, int newx, int newy, vector <Square *> &enemyPieces);
     void makeMove(string initial, string dest, std::ostream &out, std::istream &in); 
     void makeMove(int row, int col, int newRow, int newCol, ostream &out, istream &in);
     void resign(std::ostream &out);

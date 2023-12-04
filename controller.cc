@@ -249,8 +249,106 @@ bool Controller::checksOtherPlayer(int x, int y, int newx, int newy)
     }
 }
 
+bool Controller::isUnderAttack(Square* piece, vector <Square *> &enemyPieces) {
+    for(auto m : enemyPieces){
+        for(auto k : *m->getPiece()->getValidMoves()){
+            if(k.type == CAPTURING && k.x == piece->getX() && k.y == piece->getY()){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Controller::canBeCaptured(int x, int y, int newx, int newy, vector <Square *> &enemyPieces) {
+    ChessPiece *tmp = b.getSquare(x, y)->getPiece();
+    bool canBeCaptured = false;
+
+    if (tmp)
+    {
+        bool hasMoved = true;
+        bool enPassant = false;
+
+        if (tmp->getType() == KING) {
+            hasMoved = static_cast<King*>(tmp)->getMoved();
+        }
+        if (tmp->getType() == ROOK) {
+            hasMoved = static_cast<Rook*>(tmp)->getMoved();
+        }
+
+        ChessPiece *dest = nullptr;
+        if(tmp->getType() == PAWN){
+            Pawn *ourPawn = static_cast<Pawn*>(tmp);
+
+            for(auto n: *ourPawn->getValidMoves()){
+                if(n.type == ENPASSANT && n.x == newx && n.y == newy) {
+                    enPassant = true;
+                    dest = new Pawn(*(static_cast<Pawn *>(b.getSquare(x, newy)->getPiece())));
+                }
+            }
+        }
 
 
+        if (b.getSquare(newx, newy)->getPiece())
+        {
+            if (b.getSquare(newx, newy)->getPiece()->getType() == PAWN)
+            {
+                dest = new Pawn(*(static_cast<Pawn *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == ROOK)
+            {
+                dest = new Rook(*(static_cast<Rook *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == BISHOP)
+            {
+                dest = new Bishop(*(static_cast<Bishop *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == KING)
+            {
+                dest = new King(*(static_cast<King *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == QUEEN)
+            {
+                dest = new Queen(*(static_cast<Queen *>(b.getSquare(newx, newy)->getPiece())));
+            }
+            else if (b.getSquare(newx, newy)->getPiece()->getType() == KNIGHT)
+            {
+                dest = new Knight(*(static_cast<Knight *>(b.getSquare(newx, newy)->getPiece())));
+            }
+        }
+
+        b.makeMove(x, y, newx, newy);
+        b.refreshLegalMoves();
+
+        
+        if (isUnderAttack(b.getSquare(newx, newy), enemyPieces))
+        {
+            canBeCaptured = true;
+        }
+        
+        if(enPassant){
+            b.getSquare(x,newy)->setPiece(dest);
+            static_cast<Pawn*>(dest)->setMovedTwo(true);
+            b.getSquare(newx,newy)->setPiece(nullptr);
+        }else{
+            b.getSquare(newx, newy)->setPiece(dest);
+        }
+        
+        b.getSquare(x, y)->setPiece(tmp);
+
+        if(!hasMoved){
+            if (tmp->getType() == KING) {
+                static_cast<King*>(tmp)->setMoved(false);
+            }
+            if (tmp->getType() == ROOK) {
+                static_cast<Rook*>(tmp)->setMoved(false);
+            }
+        }
+
+        b.refreshLegalMoves();
+        return canBeCaptured;
+    }
+}
 
 void Controller::startGame(std::istream &in, std::ostream &out) {
     string player1, player2, cmd;
@@ -280,6 +378,9 @@ void Controller::startGame(std::istream &in, std::ostream &out) {
            makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
          } else if (player == LV2) {
             pair<pair<int,int>,pair<int,int>> move = generateLV2Move(turn);
+           makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
+         }else if (player == LV3){
+            pair<pair<int,int>,pair<int,int>> move = generateLV3Move(turn);
            makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
          }
            print(out);
@@ -630,7 +731,9 @@ void Controller::setup(std::istream &in, std::ostream &out)
             {
                 out << "Atleast one of the Kings is in check" << endl;
             }
+            else if (checkForStaleMate(out)) {
 
+            }
             else
             {
                 break;
@@ -692,7 +795,79 @@ bool Controller::checkForStaleMate(ostream &out)
         return true;
     }
 
-    return false;
+
+    bool insufficientPieces = false;
+    // pair<int, int> bishops {0, 0};
+    // pair<int, int> bishopSquareCol {0, 0};
+    // pair<int, int> rooks {0, 0};
+    // pair<int, int> queens {0, 0};
+    // pair<int, int> pawns {0, 0};
+    // pair<int, int> knights {0, 0};
+    
+    // for (int i = 0; i < b.boardDim; i++) {
+    //     for (int j; j < b.boardDim; j++) {
+    //         ChessPiece *temp = b.getSquare(i, j)->getPiece();
+    //         if (temp) {
+    //             switch (temp->getType()) {
+    //                 case PAWN:
+    //                     (temp->getColour()) ? ++pawns.first : ++pawns.second;
+    //                     break;
+    //                 case ROOK:
+    //                     (temp->getColour()) ? ++rooks.first : ++rooks.second;
+    //                     break;
+    //                 case QUEEN:
+    //                     (temp->getColour()) ? ++queens.first : ++queens.second;
+    //                     break;
+    //                 case KNIGHT:
+    //                     (temp->getColour()) ? ++queens.first : ++queens.second;
+    //                     break;
+    //                 case BISHOP:
+    //                     (temp->getColour()) ? ++bishops.first : ++bishops.second;
+    //                     (b.getSquare(i ,j)->getColour()) ? ++bishopSquareCol.first : ++bishopSquareCol.second;
+    //                     break;
+    //                 default:
+    //                     break;
+    //             }
+    //         }
+    //     }
+    // }
+
+    // std::cout << (pawns.first == 0) << (pawns.second == 0) << endl;
+    // std::cout << (bishops.first == 0) <<( bishops.second  == 0) << endl;
+    // std::cout << knights.first << knights.second << endl;
+    // std::cout << rooks.first << rooks.second << endl;
+    // std::cout << queens.first << queens.second << endl;
+
+    // if (rooks.first == 0 && rooks.second == 0 && queens.first == 0 && queens.second == 0 && pawns.first == 0 && pawns.second == 0) {
+    //     cout << "Im here" << endl;
+    //     if (bishops.first == 0 && bishops.second == 0 && knights.first == 0 && knights.second == 0) {
+    //             // Case for king vs king
+    //             cout << "Im here" << endl;
+    //             insufficientPieces = true;
+    //     } else if (((bishops.first == 1 && bishops.second == 0) || (bishops.first == 0 && bishops.second == 1)) 
+    //                 && knights.first == 0 && knights.second == 0) {
+    //                     // case for king and one bishop vs king
+    //                     insufficientPieces = true;
+    //     } else if (((knights.first == 1 && knights.second == 0) || (knights.first == 0 && knights.second == 1)) 
+    //                 && bishops.first == 0 && bishops.second == 0) {
+    //                     // case for king and one knight vs king
+    //                     insufficientPieces = true;
+    //     } else if (((knights.first == 2 && knights.second == 0) || (knights.first == 0 && knights.second == 2)) 
+    //                 && bishops.first == 0 && bishops.second == 0) {
+    //                     // case for king and two knight vs king
+    //                     insufficientPieces = true;
+    //     } else if (knights.first == 0 && knights.second == 0 && bishops.first == 1 && bishops.second == 1 
+    //                 && bishopSquareCol.first == bishopSquareCol.second) {
+    //                     // case for king and bishop vs king and bishop on same colour square
+    //                     insufficientPieces = true;
+
+    //     }
+    // }
+    if (insufficientPieces) {
+        out << "Stalemate!" << endl;
+    }
+
+    return insufficientPieces;
 }
 
 void Controller::resign(ostream &out) {
@@ -713,7 +888,7 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
   { pieces = blackPieces;
   } 
   
- 
+
 
     pieces.clear();
 
@@ -751,16 +926,15 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
 
 
 pair<pair<int,int>,pair<int,int>> Controller:: generateLV2Move(Colour c) {
-vector <Square *> &pieces = whitePieces;
+  vector <Square *> &pieces = whitePieces;
 
- b.refreshLegalMoves();
+  b.refreshLegalMoves();
   filterValidMoves(); 
 
   if (c == Black) 
-  { pieces = blackPieces;
+  { 
+    pieces = blackPieces;
   } 
-
-
 
     pieces.clear();
 
@@ -770,7 +944,7 @@ vector <Square *> &pieces = whitePieces;
 
     int x,y,newX,newY;
         
-       for (int i = 0 ; i < b.boardDim; ++i) {
+    for (int i = 0 ; i < b.boardDim; ++i) {
         for (int j = 0; j <b.boardDim; ++j) {
             Square *tmp = b.getSquare(i,j);
             if(tmp->getPiece() && tmp->getPiece()->getColour() == c && (*tmp->getPiece()->getValidMoves()).size() != 0) {
@@ -800,8 +974,8 @@ vector <Square *> &pieces = whitePieces;
               b.refreshLegalMoves();
                 filterValidMoves();
             auto m = *(square->getPiece()->getValidMoves());
-        for (auto move : m) {
-             if(move.type == CAPTURING || move.type == ENPASSANT) {
+            for (auto move : m) {
+                if(move.type == CAPTURING || move.type == ENPASSANT) {
                 noCapturingMove = false;
                 x = square->getX();
                 y = square->getY();
@@ -820,16 +994,80 @@ vector <Square *> &pieces = whitePieces;
 
 }
 
-
 pair<pair<int,int>,pair<int,int>> Controller:: generateLV3Move(Colour c) {
   vector <Square *> &pieces = whitePieces;
+  vector <Square *> &enemyPieces = blackPieces;
+  
+  b.refreshLegalMoves();
+  filterValidMoves(); 
 
   if (c == Black) 
-  { pieces = blackPieces;
+  { 
+    enemyPieces = whitePieces;
+    pieces = blackPieces;
   } 
 
+  pieces.clear();
+  enemyPieces.clear();
 
+  bool noDefendingMoves = true;
+  int x, y, newX, newY;
 
+  vector <Square *> gettingAttacked;
+
+    for (int i = 0 ; i < b.boardDim; ++i) {
+        for (int j = 0; j <b.boardDim; ++j) {
+            Square *tmp = b.getSquare(i,j);
+            if(tmp->getPiece() && tmp->getPiece()->getColour() == c && (*tmp->getPiece()->getValidMoves()).size() != 0) {
+                pieces.emplace_back(tmp);
+            }
+            if(tmp->getPiece() && tmp->getPiece()->getColour() != c && (*tmp->getPiece()->getValidMoves()).size() != 0) {
+                enemyPieces.emplace_back(tmp);
+            }
+        }
+    }
+
+    for(auto n : pieces){
+        if (isUnderAttack(n, enemyPieces)) gettingAttacked.emplace_back(n);
+    }
+
+    if (gettingAttacked.size() != 0) {
+        for (auto square: gettingAttacked) {
+            b.refreshLegalMoves();
+            filterValidMoves();
+            auto m = *(square->getPiece()->getValidMoves());
+            for (auto move : m) {
+                if (!canBeCaptured(square->getX(), square->getY(), move.x, move.y, enemyPieces)) {
+                    x = square->getX();
+                    y = square->getY();
+                    newX = move.x;
+                    newY = move.y;
+                    noDefendingMoves = false;
+                }
+            }
+        }
+    }else{
+        for (auto square: pieces) {
+            b.refreshLegalMoves();
+            filterValidMoves();
+            auto m = *(square->getPiece()->getValidMoves());
+            for (auto move : m) {
+                if (!canBeCaptured(square->getX(), square->getY(), move.x, move.y, enemyPieces)) {
+                    x = square->getX();
+                    y = square->getY();
+                    newX = move.x;
+                    newY = move.y;
+                    noDefendingMoves = false;
+                }
+            }
+        }
+    }
+    
+    if (!noDefendingMoves) {
+        return generateLV2Move(c);
+    }
+
+    return {{x, y}, {newX, newY}};
 
 }
 
@@ -840,7 +1078,7 @@ PlayerType Controller::translatePlayer(string player) {
         return LV1;
     } else if (player == "computer2") {
         return LV2;
-    } else {
+    } else if (player == "computer3"){
         return LV3;
     }
 }
