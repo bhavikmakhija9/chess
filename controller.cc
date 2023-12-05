@@ -589,14 +589,14 @@ bool Controller::checkForCheckMate(ostream &out)
 {
     if (b.isChecked(Black) && b.hasNoMoves(Black))
     {
-        out << "Checkmate!White Wins" << endl;
+        out << "Checkmate! White Wins" << endl;
         whiteWins++;
         return true;
     }
 
     if (b.isChecked(White) && b.hasNoMoves(White))
     {
-        out << "Checkmate!Black Wins" << endl;
+        out << "Checkmate! Black Wins" << endl;
         blackWins++;
      
         return true;
