@@ -154,23 +154,23 @@ w.drawPiece(5,1,1,3,"./pieces/Pawn.xbm");
 w.drawPiece(6,1,0,3,"./pieces/Pawn.xbm");
 w.drawPiece(7,1,1,3,"./pieces/Pawn.xbm");
 
-w.drawPiece(0,7,1,2,"./pieces/Rook.xbm");
-w.drawPiece(1,7,0,2,"./pieces/Knight.xbm");
-w.drawPiece(2,7,1,2,"./pieces/Bishop.xbm");
-w.drawPiece(3,7,0,2,"./pieces/Queen.xbm");
-w.drawPiece(4,7,1,2,"./pieces/King.xbm");
-w.drawPiece(5,7,0,2,"./pieces/Bishop.xbm");
-w.drawPiece(6,7,1,2,"./pieces/Knight.xbm");
-w.drawPiece(7,7,0,2,"./pieces/Rook.xbm");
+w.drawPiece(0,7,0,2,"./pieces/Rook.xbm");
+w.drawPiece(1,7,1,2,"./pieces/Knight.xbm");
+w.drawPiece(2,7,0,2,"./pieces/Bishop.xbm");
+w.drawPiece(3,7,1,2,"./pieces/Queen.xbm");
+w.drawPiece(4,7,0,2,"./pieces/King.xbm");
+w.drawPiece(5,7,1,2,"./pieces/Bishop.xbm");
+w.drawPiece(6,7,0,2,"./pieces/Knight.xbm");
+w.drawPiece(7,7,1,2,"./pieces/Rook.xbm");
 
-w.drawPiece(0,6,0,2,"./pieces/Pawn.xbm");
-w.drawPiece(1,6,1,2,"./pieces/Pawn.xbm");
-w.drawPiece(2,6,0,2,"./pieces/Pawn.xbm");
-w.drawPiece(3,6,1,2,"./pieces/Pawn.xbm");
-w.drawPiece(4,6,0,2,"./pieces/Pawn.xbm");
-w.drawPiece(5,6,1,2,"./pieces/Pawn.xbm");
-w.drawPiece(6,6,0,2,"./pieces/Pawn.xbm");
-w.drawPiece(7,6,1,2,"./pieces/Pawn.xbm");
+w.drawPiece(0,6,1,2,"./pieces/Pawn.xbm");
+w.drawPiece(1,6,0,2,"./pieces/Pawn.xbm");
+w.drawPiece(2,6,1,2,"./pieces/Pawn.xbm");
+w.drawPiece(3,6,0,2,"./pieces/Pawn.xbm");
+w.drawPiece(4,6,1,2,"./pieces/Pawn.xbm");
+w.drawPiece(5,6,0,2,"./pieces/Pawn.xbm");
+w.drawPiece(6,6,1,2,"./pieces/Pawn.xbm");
+w.drawPiece(7,6,0,2,"./pieces/Pawn.xbm");
 
 }
 
