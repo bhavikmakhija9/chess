@@ -399,121 +399,10 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
     int newRow = translateMove(dest).first;
     int newCol = translateMove(dest).second;
     // Translates human inputed moves into move format that functions understand
-   
-   ChessPiece *tmp = b.getSquare(row, col)->getPiece();
-
-    if (tmp) // checking if there is a piece on that square
-    {
-        if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
-        {
-            // If pawn gets to opposite end of board, expects user to give it the piece type it promotes the pawn to
-            if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'p' && newRow == b.boardDim-1)
-            {
-                char newPiece;
-                in >> newPiece;
-                if (newPiece < 'a')
-                {
-                    newPiece += 32;
-                }
-                if (newPiece != 'k')
-                {
-                    b.getSquare(row, col)->setPiece(translate(newPiece));
-                    b.makeMove(row, col, newRow, newCol);
-                    toggleTurn();
-                    b.refreshForEnPassant(turn);
-                }
-            }
-            else if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'P' && newRow == 0)
-            {
-                char newPiece;
-                in >> newPiece;
-                if (newPiece > 'Z')
-                {
-                    newPiece -= 32;
-                }
-                if (newPiece != 'K')
-                {
-                    b.getSquare(row, col)->setPiece(translate(newPiece));
-                    b.makeMove(row, col, newRow, newCol);
-                    toggleTurn();
-                    b.refreshForEnPassant(turn);
-                }
-            }
-            // Castling requires both the king and the rook to move positions
-            else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col + 2 == newCol) {
-                b.makeMove(row,col,newRow,newCol);
-                b.makeMove(row, b.boardDim-1,newRow,col+1);
-                toggleTurn();
-                b.refreshForEnPassant(turn);
-            } 
-            else if (b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col - 2 == newCol) {
-                b.makeMove(row,col,newRow,newCol);
-                b.makeMove(row, 0,newRow,col-1);
-                toggleTurn();
-                b.refreshForEnPassant(turn);
-            }
-            else
-            {
-                bool enPassant = false;
-                ChessPiece *ourPawn = b.getSquare(row, col)->getPiece();
-                
-                for(auto n: *ourPawn->getValidMoves()){
-                    if(n.type == ENPASSANT && n.x == newRow && n.y == newCol) {
-                        enPassant = true;
-                    }
-                }
-
-                if(!enPassant){
-                    b.makeMove(row, col, newRow, newCol);
-                    toggleTurn();
-                    b.refreshForEnPassant(turn);
-                }else{
-                    // If En Passant, remove the piece it passes
-                    b.makeMove(row, col, newRow, newCol);
-                    b.getSquare(row, newCol)->setPiece(nullptr);
-                    toggleTurn();
-                    b.refreshForEnPassant(turn);
-                }
-            }
-
-            b.refreshLegalMoves();
-            filterValidMoves();
-            b.notifyObservers();
-            // After move is made, update displays and refresh and fitler the valid moves 
-        }
-        else
-        {
-            out << "Illegal Move" << endl;
-        }
-    }
-    else
-    {
-        out << "No Piece there" << endl;
-    }
-    if (checkForCheckMate(out))
-    { 
-        gameNotDone = false;
-            if (turn == Black) {
-            turn == White;
-        }
-        setupMode = false;
-        
-    }
-    else if (checkForCheck(out))
-    {
-  
-    }
-    else if (checkForStaleMate(out))
-    {
-        gameNotDone = false;
-        if (turn == Black) {
-            turn == White;
-        }
-        setupMode = false;
-    }
+   makeMove(row, col, newRow, newCol, out, in, true);
 }
 
-void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out, istream &in)
+void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out, istream &in, bool human)
 {
     b.refreshLegalMoves();
     filterValidMoves();
@@ -527,19 +416,43 @@ void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out
             // Computer will always pawn promote to queen, normally it is the best option
             if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'p' && newRow == b.boardDim-1)
             {
-                b.getSquare(row, col)->setPiece(translate('q'));
-                b.makeMove(row, col, newRow, newCol);
-                toggleTurn();
-                b.refreshForEnPassant(turn);
+                char newPiece;
+                if (human) {
+                    in >> newPiece;
+                    if (newPiece < 'a')
+                    {
+                        newPiece += 32;
+                    }
+                } else {
+                    newPiece = 'q';
+                }
+                if (newPiece != 'k' && newPiece != 'p') {
+                    b.getSquare(row, col)->setPiece(translate(newPiece));
+                    b.makeMove(row, col, newRow, newCol);
+                    toggleTurn();
+                    b.refreshForEnPassant(turn);
+                }
             }
             
             else if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'P' && newRow == 0)
             {
-                
-                    b.getSquare(row, col)->setPiece(translate('Q'));
+                char newPiece;
+                if (human) {
+                    in >> newPiece;
+                    if (newPiece > 'Z')
+                    {
+                        newPiece -= 32;
+                    }
+                } else {
+                    newPiece = 'Q';
+                }
+
+                if (newPiece != 'K' && newPiece != 'P') {
+                    b.getSquare(row, col)->setPiece(translate(newPiece));
                     b.makeMove(row, col, newRow, newCol);
                     toggleTurn();
                     b.refreshForEnPassant(turn);
+                }
                 
             }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col + 2 == newCol) {
                 b.makeMove(row,col,newRow,newCol);
@@ -819,6 +732,9 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
     int random = rand()%pieces.size();
 
     Square * randomSquare = pieces.at(random);
+
+    b.refreshLegalMoves();
+    filterValidMoves();
     
     auto moves = *(randomSquare->getPiece()->getValidMoves());
     

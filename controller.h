@@ -66,7 +66,7 @@ class Controller
     void makeMove(string initial, string dest, std::ostream &out, std::istream &in); 
 
     // Called when a Computer player makes a move
-    void makeMove(int row, int col, int newRow, int newCol, ostream &out, istream &in);
+    void makeMove(int row, int col, int newRow, int newCol, ostream &out, istream &in, bool human = false);
 
     // The player whose turn it is will resign and lose the game
     void resign(std::ostream &out);
