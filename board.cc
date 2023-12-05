@@ -1,6 +1,7 @@
 #include "board.h"
 #include <vector>
 #include <utility>
+#include <memory>
 using namespace std;
 
 Square::Square() : x{0}, y{0} {};
@@ -10,31 +11,27 @@ Square::Square(const Square &other)
     x = other.x;
     y = other.y;
     myC = other.myC;
-    if (cp)
-    {
-        delete cp;
-    }
     if (other.cp)
     {
         switch (other.cp->getType())
         {
         case PAWN:
-            cp = new Pawn(*(static_cast<Pawn *>(other.cp)));
+            cp = make_unique<Pawn>(*(static_cast<Pawn*>(other.cp.get())));
             break;
         case ROOK:
-            cp = new Rook(*(static_cast<Rook *>(other.cp)));
+            cp = make_unique<Rook>(*(static_cast<Rook*>(other.cp.get())));
             break;
         case BISHOP:
-            cp = new Bishop(*(static_cast<Bishop *>(other.cp)));
+            cp = make_unique<Bishop>(*(static_cast<Bishop*>(other.cp.get())));
             break;
         case QUEEN:
-            cp = new Queen(*(static_cast<Queen *>(other.cp)));
+            cp = make_unique<Queen>(*(static_cast<Queen*>(other.cp.get())));
             break;
         case KNIGHT:
-            cp = new Knight(*(static_cast<Knight *>(other.cp)));
+            cp = make_unique<Knight>(*(static_cast<Knight*>(other.cp.get())));
             break;
         case KING:
-            cp = new King(*(static_cast<King *>(other.cp)));
+            cp = make_unique<King>(*(static_cast<King*>(other.cp.get())));
             break;
         default:
             break;
@@ -46,12 +43,46 @@ Square::Square(const Square &other)
     }
 }
 
+Square& Square::operator=(const Square &other) {
+    x = other.x;
+    y = other.y;
+    myC = other.myC;
+    if (other.cp)
+    {
+        switch (other.cp->getType())
+        {
+        case PAWN:
+            cp = make_unique<Pawn>(*(static_cast<Pawn*>(other.cp.get())));
+            break;
+        case ROOK:
+            cp = make_unique<Rook>(*(static_cast<Rook*>(other.cp.get())));
+            break;
+        case BISHOP:
+            cp = make_unique<Bishop>(*(static_cast<Bishop*>(other.cp.get())));
+            break;
+        case QUEEN:
+            cp = make_unique<Queen>(*(static_cast<Queen*>(other.cp.get())));
+            break;
+        case KNIGHT:
+            cp = make_unique<Knight>(*(static_cast<Knight*>(other.cp.get())));
+            break;
+        case KING:
+            cp = make_unique<King>(*(static_cast<King*>(other.cp.get())));
+            break;
+        default:
+            break;
+        }
+    }
+    else
+    {
+        cp = nullptr;
+    }
+    return *this;
+}
+
 void Square::clearSquare()
 {
-    if (cp)
-    {
-        delete cp;
-    }
+    cp.reset();
     cp = nullptr;
 }
 
@@ -83,12 +114,13 @@ void Square::setColour(Colour col)
 
 bool Square::isEmpty() { return !cp; }
 
-void Square::setPiece(ChessPiece *newCp)
+void Square::setPiece(unique_ptr<ChessPiece>&& newCp)
 {
-    cp = newCp;
+    cp.reset();
+    cp = move(newCp);
 }
 
-ChessPiece *Square::getPiece() { return cp; };
+ChessPiece *Square::getPiece() { return cp.get(); };
 
 void Square::attach(Observer *o) { observers.emplace_back(o); }
 
@@ -103,10 +135,6 @@ void Square::notifyAllObservers()
 
 Square::~Square()
 {
-    if (cp)
-    {
-        delete cp;
-    }
 }
 
 Board::Board() {}
@@ -125,14 +153,14 @@ void Board::clearBoard()
 
 void Board::setWarFormationRows(int i, Colour c)
 {
-    board[i][0].setPiece(new Rook(c));
-    board[i][1].setPiece(new Knight(c));
-    board[i][2].setPiece(new Bishop(c));
-    board[i][3].setPiece(new Queen(c));
-    board[i][4].setPiece(new King(c));
-    board[i][5].setPiece(new Bishop(c));
-    board[i][6].setPiece(new Knight(c));
-    board[i][7].setPiece(new Rook(c));
+    board[i][0].setPiece(make_unique<Rook>(c));
+    board[i][1].setPiece(make_unique<Knight>(c));
+    board[i][2].setPiece(make_unique<Bishop>(c));
+    board[i][3].setPiece(make_unique<Queen>(c));
+    board[i][4].setPiece(make_unique<King>(c));
+    board[i][5].setPiece(make_unique<Bishop>(c));
+    board[i][6].setPiece(make_unique<Knight>(c));
+    board[i][7].setPiece(make_unique<Rook>(c));
 }
 
 void Board::refreshLegalMoves()
@@ -162,14 +190,14 @@ void Board::defBoard()
         {
             for (int j = 0; j < boardDim; j++)
             {
-                board[i][j].setPiece(new Pawn(Colour::Black));
+                board[i][j].setPiece(make_unique<Pawn>(Colour::Black));
             }
         }
         else if (i == 6)
         {
             for (int j = 0; j < boardDim; j++)
             {
-                board[i][j].setPiece(new Pawn(Colour::White));
+                board[i][j].setPiece(make_unique<Pawn>(Colour::White));
             }
         }
         else if (i == 7)
@@ -246,9 +274,7 @@ void Board::makeMove(int x, int y, int newx, int newy)
         }
     }
 
-    board[newx][newy].setPiece(board[x][y].getPiece());
-
-    board[x][y].setPiece(nullptr);
+    board[newx][newy].setPiece(board[x][y].getPiece()->clone());
 
     board[x][y].clearSquare();
 

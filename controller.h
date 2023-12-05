@@ -23,7 +23,7 @@ class Controller
     vector <Square *> whitePieces;
 
     // Turns a character into the corresponding ChessPiece
-    ChessPiece *translate(char c);
+    unique_ptr<ChessPiece> translate(char c);
     
     // Sets player type, human or computer level 1-4
     PlayerType translatePlayer(string player);

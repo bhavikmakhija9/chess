@@ -2,13 +2,14 @@
 #define BOARD_H
 #include <vector>
 #include <iostream>
+#include <memory>
 #include "pieces.h"
 #include "observers.h"
 using namespace std;
 
 class Square
 {
-    ChessPiece *cp = nullptr;
+    unique_ptr<ChessPiece> cp;
     // Coords of the square on the board
     int x, y;
     // List of Displays
@@ -19,9 +20,10 @@ class Square
 public:
     Square();
     Square(const Square &other);
+    Square& operator=(const Square &other);
     // Checks to see if a piece exists or ntt
     bool isEmpty();
-    void setPiece(ChessPiece *newCp);
+    void setPiece(unique_ptr<ChessPiece>&& newCp);
     // removes a piece from the square if it exists
     void clearSquare();
     void setCoords(int x, int y);

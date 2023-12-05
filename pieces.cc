@@ -4,7 +4,9 @@
 #include <vector>
 using namespace std;
 
-ChessPiece::ChessPiece(Colour c) : mycolour(c){};
+ChessPiece::ChessPiece(Colour c) : mycolour(c) {};
+
+ChessPiece::ChessPiece(Colour c, vector<Move> validMoves): mycolour(c), validMoves(validMoves) {}
 
 Colour ChessPiece::getColour() const { return mycolour; }
 
@@ -42,11 +44,15 @@ bool ChessPiece::isLegalMove(int newx, int newy, Colour turn)
 
 Pawn::Pawn(Colour c) : ChessPiece(c){};
 
+Pawn::Pawn(const Pawn& other): ChessPiece(other.mycolour, other.validMoves), justMovedTwo(other.justMovedTwo) {}
+
 void Pawn::setMovedTwo(bool b) { justMovedTwo = b; }
 
 int Pawn::getValue() const {return 1;}
 
 bool Pawn::getMovedTwo() { return justMovedTwo; }
+
+unique_ptr<ChessPiece> Pawn::clone() const { return std::make_unique<Pawn>(*this); }
 
 void Pawn::refreshLegalMoves(int x, int y, Board &b)
 {
@@ -221,12 +227,16 @@ ChessPiece::~ChessPiece() {}
 
 Rook::Rook(Colour c) : ChessPiece(c), moved(false){};
 
+Rook::Rook(const Rook& other): ChessPiece(other.mycolour, other.validMoves), moved(other.moved) {}
+
 int Rook::getValue() const {return 5;}
 
 void Rook::setMoved(bool b)
 {
     this->moved = b;
 }
+
+unique_ptr<ChessPiece> Rook::clone() const { return std::make_unique<Rook>(*this); }
 
 void Rook::refreshLegalMoves(int x, int y, Board &b)
 {
@@ -349,9 +359,13 @@ char Rook::getPieceChar() const
     }
 }
 
-Bishop::Bishop(Colour c) : ChessPiece(c){};
+Bishop::Bishop(Colour c) : ChessPiece(c) {};
+
+Bishop::Bishop(const Bishop& other): ChessPiece(other.mycolour, other.validMoves) {}
 
 int Bishop::getValue() const { return 3; }
+
+unique_ptr<ChessPiece> Bishop::clone() const { return std::make_unique<Bishop>(*this); }
 
 void Bishop::refreshLegalMoves(int x, int y, Board &b)
 {
@@ -478,12 +492,16 @@ char Bishop::getPieceChar() const
     }
 }
 
-King::King(Colour c) : ChessPiece(c), moved(false){};
+King::King(Colour c) : ChessPiece(c), moved(false) {};
+
+King::King(const King& other): ChessPiece(other.mycolour, other.validMoves), moved(other.moved) {}
 
 void King::setMoved(bool b) { moved = b; }
 bool King::getMoved() { return moved; }
 
 int King::getValue() const { return 15; } //It is the most important piece
+
+unique_ptr<ChessPiece> King::clone() const { return std::make_unique<King>(*this); }
 
 void King::refreshLegalMoves(int x, int y, Board &b)
 {
@@ -712,7 +730,11 @@ char King::getPieceChar() const
     }
 }
 
-Queen::Queen(Colour c) : ChessPiece(c){};
+Queen::Queen(Colour c) : ChessPiece(c) {};
+
+Queen::Queen(const Queen& other): ChessPiece(other.mycolour, other.validMoves) {}
+
+unique_ptr<ChessPiece> Queen::clone() const { return std::make_unique<Queen>(*this); }
 
 void Queen::refreshLegalMoves(int x, int y, Board &b)
 {
@@ -937,9 +959,13 @@ char Queen::getPieceChar() const
     }
 }
 
-Knight::Knight(Colour c) : ChessPiece(c){};
+Knight::Knight(Colour c) : ChessPiece(c) {}
+
+Knight::Knight(const Knight& other): ChessPiece(other.mycolour, other.validMoves) {}
 
 int Knight::getValue() const { return 3; }
+
+unique_ptr<ChessPiece> Knight::clone() const { return std::make_unique<Knight>(*this); }
 
 void Knight::refreshLegalMoves(int x, int y, Board &b)
 {

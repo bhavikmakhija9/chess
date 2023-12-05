@@ -248,7 +248,7 @@ void Controller::filterValidMoves()
 }
 
 void Controller::simulateMoveForCheckOrCapture(int x, int y, int newx, int newy, Colour col, bool& start, vector <Square *> &enemyPieces) {
-    ChessPiece *tmp = b.getSquare(x, y)->getPiece();
+    unique_ptr<ChessPiece> tmp = b.getSquare(x, y)->getPiece()->clone();
 
     if (tmp)
     {
@@ -258,52 +258,28 @@ void Controller::simulateMoveForCheckOrCapture(int x, int y, int newx, int newy,
         bool enPassant = false;
 
         if (tmp->getType() == KING) {
-            hasMoved = static_cast<King*>(tmp)->getMoved();
+            hasMoved = static_cast<King*>(tmp.get())->getMoved();
         }
         if (tmp->getType() == ROOK) {
-            hasMoved = static_cast<Rook*>(tmp)->getMoved();
+            hasMoved = static_cast<Rook*>(tmp.get())->getMoved();
         }
 
-        ChessPiece *dest = nullptr;
+        unique_ptr<ChessPiece> dest;
         if(tmp->getType() == PAWN){
-            Pawn *ourPawn = static_cast<Pawn*>(tmp);
+            Pawn *ourPawn = static_cast<Pawn*>(tmp.get());
 
             for(auto n: *ourPawn->getValidMoves()){
                 // If the move we are making is enpassant, store the piece it is taken so it can be put back
                 if(n.type == ENPASSANT && n.x == newx && n.y == newy) {
                     enPassant = true;
-                    dest = new Pawn(*(static_cast<Pawn *>(b.getSquare(x, newy)->getPiece())));
+                    dest = b.getSquare(x, newy)->getPiece()->clone();
                 }
             }
         }
 
          // Make deep copy of the piece being taken if it exists on the square
-        if (b.getSquare(newx, newy)->getPiece())
-        {
-            if (b.getSquare(newx, newy)->getPiece()->getType() == PAWN)
-            {
-                dest = new Pawn(*(static_cast<Pawn *>(b.getSquare(newx, newy)->getPiece())));
-            }
-            else if (b.getSquare(newx, newy)->getPiece()->getType() == ROOK)
-            {
-                dest = new Rook(*(static_cast<Rook *>(b.getSquare(newx, newy)->getPiece())));
-            }
-            else if (b.getSquare(newx, newy)->getPiece()->getType() == BISHOP)
-            {
-                dest = new Bishop(*(static_cast<Bishop *>(b.getSquare(newx, newy)->getPiece())));
-            }
-            else if (b.getSquare(newx, newy)->getPiece()->getType() == KING)
-            {
-                dest = new King(*(static_cast<King *>(b.getSquare(newx, newy)->getPiece())));
-            }
-            else if (b.getSquare(newx, newy)->getPiece()->getType() == QUEEN)
-            {
-                dest = new Queen(*(static_cast<Queen *>(b.getSquare(newx, newy)->getPiece())));
-            }
-            else if (b.getSquare(newx, newy)->getPiece()->getType() == KNIGHT)
-            {
-                dest = new Knight(*(static_cast<Knight *>(b.getSquare(newx, newy)->getPiece())));
-            }
+        if (b.getSquare(newx, newy)->getPiece()) {
+            dest = b.getSquare(newx, newy)->getPiece()->clone();
         }
 
         // Make the move and then refresh valid moves based on movement patterns
@@ -324,23 +300,24 @@ void Controller::simulateMoveForCheckOrCapture(int x, int y, int newx, int newy,
 
         // Set the piece captured back to the destination square, based on if it is an enpassant move or not
         if(enPassant){
-            b.getSquare(x,newy)->setPiece(dest);
-            static_cast<Pawn*>(dest)->setMovedTwo(true);
-            b.getSquare(newx,newy)->setPiece(nullptr);
+            static_cast<Pawn*>(dest.get())->setMovedTwo(true);
+            b.getSquare(x,newy)->setPiece(move(dest));
+            b.getSquare(newx,newy)->clearSquare();
         }else{
-            b.getSquare(newx, newy)->setPiece(dest);
+            b.getSquare(newx, newy)->setPiece(move(dest));
         }
         
-        b.getSquare(x, y)->setPiece(tmp);
-
         if(!hasMoved){
             if (tmp->getType() == KING) {
-                static_cast<King*>(tmp)->setMoved(false);
+                static_cast<King*>(tmp.get())->setMoved(false);
             }
             if (tmp->getType() == ROOK) {
-                static_cast<Rook*>(tmp)->setMoved(false);
+                static_cast<Rook*>(tmp.get())->setMoved(false);
             }
         }
+
+        b.getSquare(x, y)->setPiece(move(tmp));
+
 
         // Refresh legal moves back to what it used to be
         b.refreshLegalMoves();
@@ -605,34 +582,34 @@ void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out
     }
 }
 
-ChessPiece *Controller::translate(char c)
+unique_ptr<ChessPiece> Controller::translate(char c)
 {
     switch (c)
     {
     case 'p':
-        return new Pawn(Colour::Black);
+        return make_unique<Pawn>(Colour::Black);
     case 'P':
-        return new Pawn(Colour::White);
+        return make_unique<Pawn>(Colour::White);
     case 'b':
-        return new Bishop(Colour::Black);
+        return make_unique<Bishop>(Colour::Black);
     case 'B':
-        return new Bishop(Colour::White);
+        return make_unique<Bishop>(Colour::White);
     case 'r':
-        return new Rook(Colour::Black);
+        return make_unique<Rook>(Colour::Black);
     case 'R':
-        return new Rook(Colour::White);
+        return make_unique<Rook>(Colour::White);
     case 'k':
-        return new King(Colour::Black);
+        return make_unique<King>(Colour::Black);
     case 'K':
-        return new King(Colour::White);
+        return make_unique<King>(Colour::White);
     case 'q':
-        return new Queen(Colour::Black);
+        return make_unique<Queen>(Colour::Black);
     case 'Q':
-        return new Queen(Colour::White);
+        return make_unique<Queen>(Colour::White);
     case 'n':
-        return new Knight(Colour::Black);
+        return make_unique<Knight>(Colour::Black);
     case 'N':
-        return new Knight(Colour::White);
+        return make_unique<Knight>(Colour::White);
     default:
         return nullptr;
     }

@@ -1,6 +1,7 @@
 #ifndef PIECES_H
 #define PIECES_H
 #include <iostream>
+#include <memory>
 #include <stdlib.h>
 #include <vector>
 using namespace std;
@@ -52,6 +53,7 @@ protected:
 
 public:
     ChessPiece(Colour c);
+    ChessPiece(Colour c, vector<Move> validMoves);
     // Searches valid move list for the move given to the user
     bool isLegalMove(int newx, int newy, Colour turn);
     // Removes a move from the valid move list
@@ -62,6 +64,7 @@ public:
     Colour getColour() const;
     vector<Move> *getValidMoves();
     virtual PieceType getType() const = 0;
+    virtual unique_ptr<ChessPiece> clone() const = 0;
     virtual char getPieceChar() const = 0;
     virtual int getValue() const = 0;
     virtual ~ChessPiece();
@@ -74,12 +77,14 @@ class Pawn : public ChessPiece
 
 public:
     Pawn(Colour c);
+    Pawn(const Pawn& other);
     void setMovedTwo(bool b);
     bool getMovedTwo();
     PieceType getType() const override;
     void refreshLegalMoves(int x, int y, Board &b) override;
     int getValue() const override;
     char getPieceChar() const override;
+    unique_ptr<ChessPiece> clone() const override;
 };
 
 class Rook : public ChessPiece
@@ -89,22 +94,26 @@ class Rook : public ChessPiece
 
 public:
     Rook(Colour c);
+    Rook(const Rook& other);
     void setMoved(bool b);
     bool getMoved() const;
     PieceType getType() const override;
     int getValue() const override;
     void refreshLegalMoves(int x, int y, Board &b) override;
     char getPieceChar() const override;
+    unique_ptr<ChessPiece> clone() const override;
 };
 
 class Bishop : public ChessPiece
 {
 public:
     Bishop(Colour c);
+    Bishop(const Bishop& other);
     PieceType getType() const override;
     int getValue() const override;
     void refreshLegalMoves(int x, int y, Board &b) override;
     char getPieceChar() const override;
+    unique_ptr<ChessPiece> clone() const override;
 };
 
 class King : public ChessPiece
@@ -114,31 +123,37 @@ class King : public ChessPiece
 
 public:
     King(Colour c);
+    King(const King& other);
     PieceType getType() const override;
     bool getMoved();
     void setMoved(bool b);
     int getValue() const override;
     void refreshLegalMoves(int x, int y, Board &b) override;
     char getPieceChar() const override;
+    unique_ptr<ChessPiece> clone() const override;
 };
 
 class Queen : public ChessPiece
 {
 public:
     Queen(Colour c);
+    Queen(const Queen& other);
     PieceType getType() const override;
     int getValue() const override;
     void refreshLegalMoves(int x, int y, Board &b) override;
     char getPieceChar() const override;
+    unique_ptr<ChessPiece> clone() const override;
 };
 
 class Knight : public ChessPiece
 {
 public:
     Knight(Colour c);
+    Knight(const Knight& other);
     PieceType getType() const override;
     int getValue() const override;
     void refreshLegalMoves(int x, int y, Board &b) override;
     char getPieceChar() const override;
+    unique_ptr<ChessPiece> clone() const override;
 };
 #endif
