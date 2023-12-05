@@ -174,8 +174,8 @@ w.drawPiece(7,7,1,2,"./pieces/Rook.xbm");
 }
 
 void GraphicsDisplay::notify(Square &s) {
-    int x = s.getX();
-    int y = s.getY();
+    int x = s.getY();
+    int y = s.getX();
 
      if (s.getColour() == Colour::Black && s.isEmpty())
         { 
@@ -210,23 +210,23 @@ void GraphicsDisplay::notify(Square &s) {
             pieceColour = 2;
         }
 
-        if(s.getPiece()->getType() == PieceType::Pawn) {
-            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/Pawn.xbm");
+        if(s.getPiece()->getType() == PieceType::PAWN) {
+            w.drawPiece(x,y,SquareColour,pieceColour,"./pieces/Pawn.xbm");
         }
-        else if(s.getPiece()->getType() == PieceType::Rook) {
-            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/Rook.xbm");
+        else if(s.getPiece()->getType() == PieceType::ROOK) {
+            w.drawPiece(x,y,SquareColour,pieceColour,"./pieces/Rook.xbm");
         }
-        else if(s.getPiece()->getType() == PieceType::Knight) {
-            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/Knight.xbm");
+        else if(s.getPiece()->getType() == PieceType::KNIGHT) {
+            w.drawPiece(x,y,SquareColour,pieceColour,"./pieces/Knight.xbm");
         }
-        else if(s.getPiece()->getType() == PieceType::Bishop) {
-            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/Bishop.xbm");
+        else if(s.getPiece()->getType() == PieceType::BISHOP) {
+            w.drawPiece(x,y,SquareColour,pieceColour,"./pieces/Bishop.xbm");
         }
-        else if(s.getPiece()->getType() == PieceType::Queen) {
-            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/Queen.xbm");
+        else if(s.getPiece()->getType() == PieceType::QUEEN) {
+            w.drawPiece(x,y,SquareColour,pieceColour,"./pieces/Queen.xbm");
         }
-        else if(s.getPiece()->getType() == PieceType::King) {
-            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/King.xbm");
+        else if(s.getPiece()->getType() == PieceType::KING) {
+            w.drawPiece(x,y,SquareColour,pieceColour,"./pieces/King.xbm");
         }
         
     }
