@@ -72,20 +72,20 @@ void Xwindow::drawString(int x, int y, string msg) {
   XDrawString(d, w, DefaultGC(d, s), x, y, msg.c_str(), msg.length());
 }
 
-void Xwindow::drawPiece(int x, int y, int colour, int squareColour, char [] filename) {
+void Xwindow::drawPiece(int x, int y, int colour, int squareColour, char filename[]) {
 
-  int x = (x * 50) + 25;
-  int y = y * 50;
+  x = (x * 50) + 25;
+  y = y * 50;
 
-  XSetForeground(d, gc, colours[sqaureColour]);
-  XSetBackground(d, gc, colours[Colour]);
+  XSetForeground(d, gc, colours[squareColour]);
+  XSetBackground(d, gc, colours[colour]);
 
   Pixmap bitmap;
   unsigned int bitmap_width, bitmap_height;
   int hotspot_x, hotspot_y;
   XReadBitmapFile(d, w, filename, &bitmap_width, &bitmap_height, &bitmap, &hotspot_x, &hotspot_y);
 
-  XCopyPlane(d, bitmap, w, gc,x, y,bitmap_width, bitmap_height,50, 50,1);
+  XCopyPlane(d, bitmap, w, gc,0, 0,bitmap_width, bitmap_height,x, y,1);
 	XSync(d, False);
 
   XFlush(d);
