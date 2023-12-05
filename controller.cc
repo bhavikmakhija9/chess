@@ -826,6 +826,7 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
     Move randomMove = moves.at(random2);
 
     return {{randomSquare->getX(), randomSquare->getY()}, {randomMove.x, randomMove.y}};
+
 } 
 
 

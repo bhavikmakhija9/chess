@@ -85,12 +85,7 @@ bool Square::isEmpty() { return !cp; }
 
 void Square::setPiece(ChessPiece *newCp)
 {
-    // if (cp)
-    // {
-    //     delete cp;
-    // }
     cp = newCp;
-
 }
 
 ChessPiece *Square::getPiece() { return cp; };
