@@ -270,7 +270,7 @@ void Controller::simulateMoveForCheckOrCapture(int x, int y, int newx, int newy,
 
             for(auto n: *ourPawn->getValidMoves()){
                 // If the move we are making is enpassant, store the piece it is taken so it can be put back
-                if(n.type == ENPASSANT && n.x == newx && n.y == newy) {
+                if (n.type == ENPASSANT && n.x == newx && n.y == newy) {
                     enPassant = true;
                     dest = b.getSquare(x, newy)->getPiece()->clone();
                 }
