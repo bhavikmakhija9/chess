@@ -137,42 +137,41 @@ w.drawString(350,412,"g");
 w.drawString(400,412,"h");
 
 w.drawPiece(0,0,1,3,"./pieces/Rook.xbm");
-w.drawString(47,25,"r");
-w.drawString(97,25,"n");
-w.drawString(147,25,"b");
-w.drawString(197,25,"q");
-w.drawString(247,25,"k");
-w.drawString(297,25,"b");
-w.drawString(347,25,"n");
-w.drawString(397,25,"r");
+w.drawPiece(0,1,0,3,"./pieces/Knight.xbm");
+w.drawPiece(0,2,1,3,"./pieces/Bishop.xbm");
+w.drawPiece(0,3,0,3,"./pieces/Queen.xbm");
+w.drawPiece(0,4,1,3,"./pieces/King.xbm");
+w.drawPiece(0,5,0,3,"./pieces/Bishop.xbm");
+w.drawPiece(0,6,1,3,"./pieces/Knight.xbm");
+w.drawPiece(0,7,0,3,"./pieces/Rook.xbm");
 
-w.drawString(47,75,"p");
-w.drawString(97,75,"p");
-w.drawString(147,75,"p");
-w.drawString(197,75,"p");
-w.drawString(247,75,"p");
-w.drawString(297,75,"p");
-w.drawString(347,75,"p");
-w.drawString(397,75,"p");
+w.drawPiece(1,0,0,3,"./pieces/Pawn.xbm");
+w.drawPiece(1,1,1,3,"./pieces/Pawn.xbm");
+w.drawPiece(1,2,0,3,"./pieces/Pawn.xbm");
+w.drawPiece(1,3,1,3,"./pieces/Pawn.xbm");
+w.drawPiece(1,4,0,3,"./pieces/Pawn.xbm");
+w.drawPiece(1,5,1,3,"./pieces/Pawn.xbm");
+w.drawPiece(1,6,0,3,"./pieces/Pawn.xbm");
+w.drawPiece(1,7,1,3,"./pieces/Pawn.xbm");
 
+w.drawPiece(7,0,1,2,"./pieces/Rook.xbm");
+w.drawPiece(7,1,0,2,"./pieces/Knight.xbm");
+w.drawPiece(7,2,1,2,"./pieces/Bishop.xbm");
+w.drawPiece(7,3,0,2,"./pieces/Queen.xbm");
+w.drawPiece(7,4,1,2,"./pieces/King.xbm");
+w.drawPiece(7,5,0,2,"./pieces/Bishop.xbm");
+w.drawPiece(7,6,1,2,"./pieces/Knight.xbm");
+w.drawPiece(7,7,0,2,"./pieces/Rook.xbm");
 
-w.drawString(47,325,"P");
-w.drawString(97,325,"P");
-w.drawString(147,325,"P");
-w.drawString(197,325,"P");
-w.drawString(247,325,"P");
-w.drawString(297,325,"P");
-w.drawString(347,325,"P");
-w.drawString(397,325,"P");
+w.drawPiece(6,0,0,2,"./pieces/Pawn.xbm");
+w.drawPiece(6,1,1,2,"./pieces/Pawn.xbm");
+w.drawPiece(6,2,0,2,"./pieces/Pawn.xbm");
+w.drawPiece(6,3,1,2,"./pieces/Pawn.xbm");
+w.drawPiece(6,4,0,2,"./pieces/Pawn.xbm");
+w.drawPiece(6,5,1,2,"./pieces/Pawn.xbm");
+w.drawPiece(6,6,0,2,"./pieces/Pawn.xbm");
+w.drawPiece(6,7,1,2,"./pieces/Pawn.xbm");
 
-w.drawString(47,375,"R");
-w.drawString(97,375,"N");
-w.drawString(147,375,"B");
-w.drawString(197,375,"Q");
-w.drawString(247,375,"K");
-w.drawString(297,375,"B");
-w.drawString(347,375,"N");
-w.drawString(397,375,"R");
 }
 
 void GraphicsDisplay::notify(Square &s) {
