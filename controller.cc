@@ -17,6 +17,7 @@ void Controller::setup(std::istream &in, std::ostream &out)
     turn = Colour::White;
     setupMode = true;
     b.emptyBoard();
+    b.notifyObservers();
     string cmd;
     while (in >> cmd)
     {
