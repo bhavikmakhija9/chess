@@ -153,15 +153,6 @@ int colour = 1;
     }
  }
 
-w.drawPiece(0,7,0,2,"./pieces/Rook.xbm");
-w.drawPiece(1,7,1,2,"./pieces/Knight.xbm");
-w.drawPiece(2,7,0,2,"./pieces/Bishop.xbm");
-w.drawPiece(3,7,1,2,"./pieces/Queen.xbm");
-w.drawPiece(4,7,0,2,"./pieces/King.xbm");
-w.drawPiece(5,7,1,2,"./pieces/Bishop.xbm");
-w.drawPiece(6,7,0,2,"./pieces/Knight.xbm");
-w.drawPiece(7,7,1,2,"./pieces/Rook.xbm");
-
 w.drawPiece(0,6,1,2,"./pieces/Pawn.xbm");
 w.drawPiece(1,6,0,2,"./pieces/Pawn.xbm");
 w.drawPiece(2,6,1,2,"./pieces/Pawn.xbm");
@@ -171,29 +162,73 @@ w.drawPiece(5,6,0,2,"./pieces/Pawn.xbm");
 w.drawPiece(6,6,1,2,"./pieces/Pawn.xbm");
 w.drawPiece(7,6,0,2,"./pieces/Pawn.xbm");
 
+w.drawPiece(0,7,0,2,"./pieces/Rook.xbm");
+w.drawPiece(1,7,1,2,"./pieces/Knight.xbm");
+w.drawPiece(2,7,0,2,"./pieces/Bishop.xbm");
+w.drawPiece(3,7,1,2,"./pieces/Queen.xbm");
+w.drawPiece(4,7,0,2,"./pieces/King.xbm");
+w.drawPiece(5,7,1,2,"./pieces/Bishop.xbm");
+w.drawPiece(6,7,0,2,"./pieces/Knight.xbm");
+w.drawPiece(7,7,1,2,"./pieces/Rook.xbm");
+
 }
 
 void GraphicsDisplay::notify(Square &s) {
-    int row = s.getX();
-    int col = s.getY();
+    int x = s.getX();
+    int y = s.getY();
 
-    int x = (col * ss) + 25;
-    int y = row * ss;
-
-     if (s.getColour() == Colour::Black)
-        {
-          w.fillRectangle(x,y,50,50,0); 
+     if (s.getColour() == Colour::Black && s.isEmpty())
+        { 
+            w.drawPiece(x,y,0,2,"./pieces/empty.xbm");
         }
-    else 
+    else if(s.getColour() == Colour::White && s.isEmpty())
         {
-            w.fillRectangle(x,y,50,50,1);
+            w.drawPiece(x,y,1,2,"./pieces/empty.xbm");
         }
 
 
     if (s.getPiece())
-    {   
-        string piece(1,s.getPiece()->getPieceChar());
-        w.drawString(x+22,y+25,piece);
+    { 
+        int pieceColour = 0;
+        int SquareColour = 0;
+
+        if (s.getColour() == Colour::Black)
+        {
+            SquareColour = 0;
+        }
+        else if (s.getColour() == Colour::White)
+        {
+            SquareColour = 1;
+        }
+
+        if (s.getPiece()->getColour() == Colour::Black)
+        {
+            pieceColour = 3;
+        }
+        else if (s.getPiece()->getColour() == Colour::White)
+        {
+            pieceColour = 2;
+        }
+
+        if(s.getPiece()->getType() == PieceType::Pawn) {
+            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/Pawn.xbm");
+        }
+        else if(s.getPiece()->getType() == PieceType::Rook) {
+            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/Rook.xbm");
+        }
+        else if(s.getPiece()->getType() == PieceType::Knight) {
+            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/Knight.xbm");
+        }
+        else if(s.getPiece()->getType() == PieceType::Bishop) {
+            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/Bishop.xbm");
+        }
+        else if(s.getPiece()->getType() == PieceType::Queen) {
+            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/Queen.xbm");
+        }
+        else if(s.getPiece()->getType() == PieceType::King) {
+            w.drawPiece(x,y,pieceColour,SquareColour,"./pieces/King.xbm");
+        }
+        
     }
 }
 
