@@ -141,8 +141,8 @@ w.drawPiece(7,1,1,3,"./pieces/Pawn.xbm");
 int colour = 1;
 
    for (int i=2; i < 6; ++i) {
-    for (int j = 0; j < 7; ++j) {
-        w.drawPiece(j,i,colour,2,"./pieces/Empty.xbm");
+    for (int j = 0; j <= 7; ++j) {
+        w.drawPiece(j,i,colour,2,"./pieces/empty.xbm");
         if (j != 7) {
             if (colour == 1) {
                 colour = 0;
