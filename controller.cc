@@ -1036,3 +1036,8 @@ PlayerType Controller::translatePlayer(string player) {
         return LV4;
     }
 }
+
+Controller::~Controller() {
+    delete td;
+    delete gd;
+}

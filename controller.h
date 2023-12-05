@@ -98,5 +98,7 @@ class Controller
 
         float getBlackWins();
 
+        ~Controller();
+
 };
 #endif
