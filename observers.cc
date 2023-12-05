@@ -100,23 +100,7 @@ ostream &operator<<(ostream &out, const TextDisplay &td)
 }
 
 
-GraphicsDisplay::GraphicsDisplay(Xwindow &xw) : w(xw) {
- 
-
- int colour = 1;
-
-   for (int i=25; i < 425; i+=50) {
-    for (int j = 0; j < 400; j+=50) {
-        w.fillRectangle(i,j,50,50,colour);
-        if (j != 350) {
-            if (colour == 1) {
-                colour = 0;
-            } else {
-                colour = 1;
-            }
-        }
-    }
- } 
+GraphicsDisplay::GraphicsDisplay(Xwindow &xw) : w(xw) { 
 
 w.drawString(12,25,"8");
 w.drawString(12,75,"7");
@@ -153,6 +137,21 @@ w.drawPiece(4,1,0,3,"./pieces/Pawn.xbm");
 w.drawPiece(5,1,1,3,"./pieces/Pawn.xbm");
 w.drawPiece(6,1,0,3,"./pieces/Pawn.xbm");
 w.drawPiece(7,1,1,3,"./pieces/Pawn.xbm");
+
+int colour = 1;
+
+   for (int i=2; i < 6; ++i) {
+    for (int j = 0; j < 7; ++j) {
+        w.drawPiece(j,i,colour,2,"./pieces/Empty.xbm");
+        if (j != 7) {
+            if (colour == 1) {
+                colour = 0;
+            } else {
+                colour = 1;
+            }
+        }
+    }
+ }
 
 w.drawPiece(0,7,0,2,"./pieces/Rook.xbm");
 w.drawPiece(1,7,1,2,"./pieces/Knight.xbm");
