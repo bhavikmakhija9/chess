@@ -32,7 +32,7 @@ Xwindow::Xwindow(int width, int height) {
   // Set up colours.
   XColor xcolour;
   Colormap cmap;
-  char color_vals[5][20]={"darkolivegreen4", "wheat1", "red", "green", "blue"};
+  char color_vals[5][20]={"darkolivegreen4", "wheat1", "white", "black", "blue"};
 
   cmap=DefaultColormap(d,DefaultScreen(d));
   for(int i=0; i < 5; ++i) {
@@ -70,4 +70,24 @@ void Xwindow::fillRectangle(int x, int y, int width, int height, int colour) {
 
 void Xwindow::drawString(int x, int y, string msg) {
   XDrawString(d, w, DefaultGC(d, s), x, y, msg.c_str(), msg.length());
+}
+
+void Xwindow::drawPiece(int x, int y, int colour, int squareColour, char [] filename) {
+
+  int x = (x * 50) + 25;
+  int y = y * 50;
+
+  XSetForeground(d, gc, colours[sqaureColour]);
+  XSetBackground(d, gc, colours[Colour]);
+
+  Pixmap bitmap;
+  unsigned int bitmap_width, bitmap_height;
+  int hotspot_x, hotspot_y;
+  XReadBitmapFile(d, w, filename, &bitmap_width, &bitmap_height, &bitmap, &hotspot_x, &hotspot_y);
+
+  XCopyPlane(d, bitmap, w, gc,x, y,bitmap_width, bitmap_height,50, 50,1);
+	XSync(d, False);
+
+  XFlush(d);
+
 }

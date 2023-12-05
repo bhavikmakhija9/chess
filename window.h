@@ -23,6 +23,8 @@ class Xwindow {
   // Draws a string
   void drawString(int x, int y, std::string msg);
 
+  // Draws a piece
+  void drawPiece(int x, int y, int colour, int squareColour, char [] filename);
 };
 
 #endif

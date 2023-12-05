@@ -136,6 +136,7 @@ w.drawString(300,412,"f");
 w.drawString(350,412,"g");
 w.drawString(400,412,"h");
 
+w.drawPiece(0,0,1,3,"./pieces/Rook.xbm");
 w.drawString(47,25,"r");
 w.drawString(97,25,"n");
 w.drawString(147,25,"b");
