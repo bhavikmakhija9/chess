@@ -14,7 +14,6 @@ Controller::Controller(Xwindow &w) : gd(new GraphicsDisplay(w)) , td(new TextDis
 
 void Controller::setup(std::istream &in, std::ostream &out)
 {
-
     turn = Colour::White;
     setupMode = true;
     b.emptyBoard();
@@ -23,6 +22,7 @@ void Controller::setup(std::istream &in, std::ostream &out)
     {
         if (cmd == "+")
         {
+            // Adds a piece to the boarc, if piece already exists it will replace that
             char piece;
             string loc;
             cin >> piece >> loc;
@@ -32,6 +32,7 @@ void Controller::setup(std::istream &in, std::ostream &out)
         }
         else if (cmd == "-")
         {
+            // Removes a piece from the sqaure if it exists
             string loc;
             cin >> loc;
             auto coords = translateMove(loc);
@@ -42,6 +43,7 @@ void Controller::setup(std::istream &in, std::ostream &out)
 
         else if (cmd == "=")
         {
+            // Changes whose turn it is upon start game
             string colour;
             cin >> colour;
 
@@ -56,6 +58,7 @@ void Controller::setup(std::istream &in, std::ostream &out)
         }
         else if (cmd == "done")
         {
+            // Exit setup mode
             int bKing = 0;
             int wKing = 0;
             bool PawnOnFirstOrLast = false;
@@ -65,6 +68,7 @@ void Controller::setup(std::istream &in, std::ostream &out)
                 for (int j = 0; j < 8; j++)
                 {
                     ChessPiece *tmp = b.getSquare(i, j)->getPiece();
+                    // cannot exist if a pawn is on the other end of the board, will need to be promoted, cannot do so in setup mode
                     if ((i == 0 || i == 7) && tmp)
                     {
                         if (tmp->getPieceChar() == 'p' || b.getSquare(i, j)->getPiece()->getPieceChar() == 'P')
@@ -123,10 +127,12 @@ void Controller::startGame(std::istream &in, std::ostream &out) {
 
     in >> player1 >> player2;
 
+    // Set the player type of white and black
     whitePlayer = translatePlayer(player1);
 
     blackPlayer = translatePlayer(player2);
 
+    // If board was not change in setup mode, give the default chess board position
     if (!setupMode) {
         b.defBoard();
         b.refreshLegalMoves();
@@ -137,32 +143,33 @@ void Controller::startGame(std::istream &in, std::ostream &out) {
     while (in >> cmd && gameNotDone) {
         if (cmd == "move")
         {
-        PlayerType player = whitePlayer;
-        if (turn == Black) {
-            player = blackPlayer;
-        }
+            // Moves a piece
+            PlayerType player = whitePlayer;
+            if (turn == Black) {
+                player = blackPlayer;
+            }
             if (player == Human) {
-            string initial, dest;
-            in >> initial >> dest;
-            makeMove(initial, dest, out, in);
-       
-         } else if (player == LV1) {
-           pair<pair<int,int>,pair<int,int>> move = generateLV1Move(turn);
-           makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
-         } else if (player == LV2) {
-            pair<pair<int,int>,pair<int,int>> move = generateLV2Move(turn);
-           makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
-         }else if (player == LV3){
-            pair<pair<int,int>,pair<int,int>> move = generateLV3Move(turn);
-           makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
-         }else if (player == LV4){
-            pair<pair<int,int>,pair<int,int>> move = generateLV4Move(turn);
+                // If human player, take input for its desired move
+                string initial, dest;
+                in >> initial >> dest;
+                makeMove(initial, dest, out, in);
+            } else if (player == LV1) { // Make program generate move based on the level
+            pair<pair<int,int>,pair<int,int>> move = generateLV1Move(turn);
             makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
-         }
-           print(out);
+            } else if (player == LV2) {
+                pair<pair<int,int>,pair<int,int>> move = generateLV2Move(turn);
+            makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
+            }else if (player == LV3){
+                pair<pair<int,int>,pair<int,int>> move = generateLV3Move(turn);
+            makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
+            }else if (player == LV4){
+                pair<pair<int,int>,pair<int,int>> move = generateLV4Move(turn);
+                makeMove(move.first.first, move.first.second, move.second.first, move.second.second,out,in);
+            }
+            print(out);
         }
          else if (cmd == "resign") {
-            
+            // game will end
             resign(out);
             break;
         }
@@ -179,12 +186,9 @@ void Controller::startGame(std::istream &in, std::ostream &out) {
 
 
 // PRIVATE METHODS
-
-typedef bool (*colourchecked)(Colour);
-typedef bool (*underAttack)(Square*, vector<Square*>&);
-
 std::pair<int, int> Controller::translateMove(string str)
 {
+    // Converts user input to techinal board inputs
     int row = 8 - str[1] + '0';
     int col = str[0] - 'a';
     return std::pair<int, int>{row, col};
@@ -192,19 +196,20 @@ std::pair<int, int> Controller::translateMove(string str)
 
 void Controller::filterValidMoves()
 {
+    // Coords of the piece and coords of the move it can make that is illegal
     vector<std::pair<int, int>> curCoords;
     vector<std::pair<int, int>> newCoords;
     for (int i = 0; i < b.boardDim; ++i)
     {
         for (int j = 0; j < b.boardDim; ++j)
         {
-            if (b.getSquare(i, j)->getPiece())
+            if (b.getSquare(i, j)->getPiece()) // Ensure that piece exists on that square
             {
-                for (auto n : *b.getSquare(i, j)->getPiece()->getValidMoves())
+                for (auto n : *b.getSquare(i, j)->getPiece()->getValidMoves()) // Loop through all of the pieces valid moves after refresh to see if any are illegal after move
                 {
-                    if (n.x >= 0 && n.x < b.boardDim && n.y >= 0 && n.y < b.boardDim)
+                    if (n.x >= 0 && n.x < b.boardDim && n.y >= 0 && n.y < b.boardDim) // ensure any potential garbage values are removed
                     {
-
+                        // Makes sure the king cannot move past a check to castle on the square it skips
                         if (n.type == CASTLING) {
                             if(n.y > j){
                                 if(!isValidCheckMove(i,j,i,j+1)){
@@ -219,6 +224,7 @@ void Controller::filterValidMoves()
                             }
                         }
                         
+                        // If the move will put its own king in check, add the piece coords and the move to the temp vectors
                         if (!isValidCheckMove(i, j, n.x, n.y))
                         {
                             curCoords.emplace_back(std::pair<int, int>{i, j});
@@ -227,12 +233,14 @@ void Controller::filterValidMoves()
                     }
                     else
                     {
+                        // Delete garbage value moves if they exist
                         b.getSquare(i, j)->getPiece()->deleteMove(n.x, n.y);
                     }
                 }
             }
         }
     }
+    // Loops through and deletes any illegal moves
     for (int i = 0; i < curCoords.size(); i++)
     {
         b.getSquare(curCoords[i].first, curCoords[i].second)->getPiece()->deleteMove(newCoords[i].first, newCoords[i].second);
@@ -244,7 +252,9 @@ void Controller::simulateMoveForCheckOrCapture(int x, int y, int newx, int newy,
 
     if (tmp)
     {
+        // Keep track of if we are simiulating a king or a rook move. If they haven't we set the the value of them back to false after sim
         bool hasMoved = true;
+
         bool enPassant = false;
 
         if (tmp->getType() == KING) {
@@ -259,6 +269,7 @@ void Controller::simulateMoveForCheckOrCapture(int x, int y, int newx, int newy,
             Pawn *ourPawn = static_cast<Pawn*>(tmp);
 
             for(auto n: *ourPawn->getValidMoves()){
+                // If the move we are making is enpassant, store the piece it is taken so it can be put back
                 if(n.type == ENPASSANT && n.x == newx && n.y == newy) {
                     enPassant = true;
                     dest = new Pawn(*(static_cast<Pawn *>(b.getSquare(x, newy)->getPiece())));
@@ -266,7 +277,7 @@ void Controller::simulateMoveForCheckOrCapture(int x, int y, int newx, int newy,
             }
         }
 
-
+         // Make deep copy of the piece being taken if it exists on the square
         if (b.getSquare(newx, newy)->getPiece())
         {
             if (b.getSquare(newx, newy)->getPiece()->getType() == PAWN)
@@ -295,12 +306,13 @@ void Controller::simulateMoveForCheckOrCapture(int x, int y, int newx, int newy,
             }
         }
 
+        // Make the move and then refresh valid moves based on movement patterns
         b.makeMove(x, y, newx, newy);
         b.refreshLegalMoves();
 
 
-        if (enemyPieces.size() == 0) { // Looking for if king is checked
-            if (b.isChecked(col))
+        if (enemyPieces.size() == 0) {  // will run a function depending on if we need to access an enemy moves vector
+            if (b.isChecked(col)) // Looking for if king is checked
             {
                 start = !start;
             }
@@ -310,7 +322,7 @@ void Controller::simulateMoveForCheckOrCapture(int x, int y, int newx, int newy,
             }
         }
 
-
+        // Set the piece captured back to the destination square, based on if it is an enpassant move or not
         if(enPassant){
             b.getSquare(x,newy)->setPiece(dest);
             static_cast<Pawn*>(dest)->setMovedTwo(true);
@@ -330,13 +342,16 @@ void Controller::simulateMoveForCheckOrCapture(int x, int y, int newx, int newy,
             }
         }
 
+        // Refresh legal moves back to what it used to be
         b.refreshLegalMoves();
     }
 }
 
 bool Controller::isValidCheckMove(int x, int y, int newx, int newy)
 {
+    // Move is successful
     bool noError = true;
+    // Tell simulate move to use is checked condition check, empty vector
     vector<Square*> nonApplicable;
     simulateMoveForCheckOrCapture(x, y, newx, newy, turn, noError, nonApplicable);
 
@@ -345,8 +360,10 @@ bool Controller::isValidCheckMove(int x, int y, int newx, int newy)
 
 bool Controller::checksOtherPlayer(int x, int y, int newx, int newy)
 {
+    // Other king is put in check after move
     bool checksOther = false;
     Colour oppC = (turn ? Black : White);
+    // Tell simulate move to use is checked condition check, empty vector
     vector<Square*> nonApplicable;
     simulateMoveForCheckOrCapture(x, y, newx, newy, oppC, checksOther, nonApplicable);
 
@@ -380,17 +397,15 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
     int col = translateMove(initial).second;
     int newRow = translateMove(dest).first;
     int newCol = translateMove(dest).second;
+    // Translates human inputed moves into move format that functions understand
    
    ChessPiece *tmp = b.getSquare(row, col)->getPiece();
 
     if (tmp) // checking if there is a piece on that square
     {
-        for (auto n : *tmp->getValidMoves()) {
-
-        }
         if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
         {
-
+            // If pawn gets to opposite end of board, expects user to give it the piece type it promotes the pawn to
             if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'p' && newRow == b.boardDim-1)
             {
                 char newPiece;
@@ -422,7 +437,9 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
                     toggleTurn();
                     b.refreshForEnPassant(turn);
                 }
-            }else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col + 2 == newCol) {
+            }
+            // Castling requires both the king and the rook to move positions
+            else if(b.getSquare(row, col)->getPiece()->getType() == PieceType::KING && col + 2 == newCol) {
                 b.makeMove(row,col,newRow,newCol);
                 b.makeMove(row, b.boardDim-1,newRow,col+1);
                 toggleTurn();
@@ -450,6 +467,7 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
                     toggleTurn();
                     b.refreshForEnPassant(turn);
                 }else{
+                    // If En Passant, remove the piece it passes
                     b.makeMove(row, col, newRow, newCol);
                     b.getSquare(row, newCol)->setPiece(nullptr);
                     toggleTurn();
@@ -460,7 +478,7 @@ void Controller::makeMove(string initial, string dest, ostream &out, istream &in
             b.refreshLegalMoves();
             filterValidMoves();
             b.notifyObservers();
-            
+            // After move is made, update displays and refresh and fitler the valid moves 
         }
         else
         {
@@ -503,21 +521,16 @@ void Controller::makeMove(int row, int col, int newRow, int newCol, ostream &out
 
     if (tmp) // checking if there is a piece on that square
     {
-        for (auto n : *tmp->getValidMoves()) {
-
-        }
         if (tmp->isLegalMove(newRow, newCol, turn)) // checking if the move is legal
         {
-
+            // Computer will always pawn promote to queen, normally it is the best option
             if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'p' && newRow == b.boardDim-1)
             {
-              
-                
-                    b.getSquare(row, col)->setPiece(translate('q'));
-                    b.makeMove(row, col, newRow, newCol);
-                    toggleTurn();
-                    b.refreshForEnPassant(turn);
-                }
+                b.getSquare(row, col)->setPiece(translate('q'));
+                b.makeMove(row, col, newRow, newCol);
+                toggleTurn();
+                b.refreshForEnPassant(turn);
+            }
             
             else if (b.getSquare(row, col)->getPiece()->getPieceChar() == 'P' && newRow == 0)
             {
@@ -698,8 +711,7 @@ bool Controller::checkForStaleMate(ostream &out)
         return true;
     }
 
-
-
+    // Hard Coded Cases for stalemate
     bool insufficientPieces = false;
     pair<int, int> bishops {0, 0};
     pair<int, int> bishopSquareCol {0, 0};
@@ -785,11 +797,8 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
   filterValidMoves();
 
   if (c == Black) 
-  { pieces = blackPieces;
-  } 
+  { pieces = blackPieces; } 
   
-
-
     pieces.clear();
 
     for (int i = 0; i < b.boardDim; ++i) {
@@ -812,13 +821,11 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV1Move(Colour c) {
     
     auto moves = *(randomSquare->getPiece()->getValidMoves());
     
-    //srand(time(NULL));
-    int random2 = rand()%moves.size(); //maybe messing up moving out of check
+    int random2 = rand() % moves.size();
 
     Move randomMove = moves.at(random2);
 
-   return {{randomSquare->getX(), randomSquare->getY()}, {randomMove.x, randomMove.y}};
-
+    return {{randomSquare->getX(), randomSquare->getY()}, {randomMove.x, randomMove.y}};
 } 
 
 
@@ -851,37 +858,37 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV2Move(Colour c) {
     }
 
     for(auto square: pieces) {
-          b.refreshLegalMoves();
-          filterValidMoves();
+        b.refreshLegalMoves();
+        filterValidMoves();
        auto m = *(square->getPiece()->getValidMoves());
         for (auto move : m) {
-             if(checksOtherPlayer(square->getX(), square->getY(), move.x, move.y)) {
+            if(checksOtherPlayer(square->getX(), square->getY(), move.x, move.y)) {
                 noCheckingMove = false;
                 noCapturingMove = false;
                 x = square->getX();
                 y = square->getY();
                 newX = move.x;
                 newY = move.y;
-             }
+            }
         }
-     }
+    } // prioritizes checking moves
 
-       if (noCheckingMove) {
+    if (noCheckingMove) {
         for(auto square: pieces) {
-              b.refreshLegalMoves();
-                filterValidMoves();
+            b.refreshLegalMoves();
+            filterValidMoves();
             auto m = *(square->getPiece()->getValidMoves());
             for (auto move : m) {
                 if(move.type == CAPTURING || move.type == ENPASSANT) {
-                noCapturingMove = false;
-                x = square->getX();
-                y = square->getY();
-                newX = move.x;
-                newY = move.y;
-             }
+                    noCapturingMove = false;
+                    x = square->getX();
+                    y = square->getY();
+                    newX = move.x;
+                    newY = move.y;
+                }
+            }
         }
-     }
-     }
+     } // Prioritzes capturing moves
 
      if (noCheckingMove && noCapturingMove) {
        return generateLV1Move(c);
@@ -914,6 +921,8 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV3Move(Colour c) {
     for (int i = 0 ; i < b.boardDim; ++i) {
         for (int j = 0; j <b.boardDim; ++j) {
             Square *tmp = b.getSquare(i,j);
+            b.refreshLegalMoves();
+            filterValidMoves(); 
             if(tmp->getPiece() && tmp->getPiece()->getColour() == c && (*tmp->getPiece()->getValidMoves()).size() != 0) {
                 pieces.emplace_back(tmp);
             }
@@ -943,7 +952,6 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV3Move(Colour c) {
             }
         }
     }else{
-    
         for (auto square: pieces) {
             auto m = *(square->getPiece()->getValidMoves());
             b.refreshLegalMoves();
@@ -987,6 +995,8 @@ pair<pair<int,int>,pair<int,int>> Controller:: generateLV4Move(Colour c) {
     for (int i = 0 ; i < b.boardDim; ++i) {
         for (int j = 0; j <b.boardDim; ++j) {
             Square *tmp = b.getSquare(i,j);
+            b.refreshLegalMoves();
+            filterValidMoves(); 
             if(tmp->getPiece() && tmp->getPiece()->getColour() == c && (*tmp->getPiece()->getValidMoves()).size() != 0) {
                 pieces.emplace_back(tmp);
             }

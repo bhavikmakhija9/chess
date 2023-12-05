@@ -6,7 +6,7 @@ using namespace std;
 
 ChessPiece::ChessPiece(Colour c) : mycolour(c){};
 
-Colour ChessPiece::getColour() { return mycolour; }
+Colour ChessPiece::getColour() const { return mycolour; }
 
 void ChessPiece::deleteMove(int newx, int newy)
 {
@@ -44,15 +44,17 @@ Pawn::Pawn(Colour c) : ChessPiece(c){};
 
 void Pawn::setMovedTwo(bool b) { justMovedTwo = b; }
 
-int Pawn::getValue() {return 1;}
+int Pawn::getValue() const {return 1;}
 
 bool Pawn::getMovedTwo() { return justMovedTwo; }
 
 void Pawn::refreshLegalMoves(int x, int y, Board &b)
 {
+    // Remove all old legal moves
     validMoves.clear();
     int newx;
 
+    // Pawn Double Move
     if (getColour() == Colour::White && x == 6)
     {
 
@@ -201,9 +203,9 @@ void Pawn::refreshLegalMoves(int x, int y, Board &b)
     }
 }
 
-PieceType Pawn::getType() { return PieceType::PAWN; }
+PieceType Pawn::getType() const { return PieceType::PAWN; }
 
-char Pawn::getPieceChar()
+char Pawn::getPieceChar() const
 {
     if (getColour() == Colour::White)
     {
@@ -219,7 +221,7 @@ ChessPiece::~ChessPiece() {}
 
 Rook::Rook(Colour c) : ChessPiece(c), moved(false){};
 
-int Rook::getValue() {return 5;}
+int Rook::getValue() const {return 5;}
 
 void Rook::setMoved(bool b)
 {
@@ -228,10 +230,11 @@ void Rook::setMoved(bool b)
 
 void Rook::refreshLegalMoves(int x, int y, Board &b)
 {
+    // Remove all old legal moves
     validMoves.clear();
     int newX, newY;
 
-    // Down moves
+    // Down moves 
     newX = x + 1;
     while (newX < b.boardDim)
     {
@@ -327,14 +330,14 @@ void Rook::refreshLegalMoves(int x, int y, Board &b)
         newY--;
     }
 }
-PieceType Rook::getType() { return PieceType::ROOK; }
+PieceType Rook::getType() const { return PieceType::ROOK; }
 
-bool Rook::getMoved()
+bool Rook::getMoved() const
 {
     return this->moved;
 }
 
-char Rook::getPieceChar()
+char Rook::getPieceChar() const
 {
     if (getColour() == Colour::White)
     {
@@ -348,10 +351,11 @@ char Rook::getPieceChar()
 
 Bishop::Bishop(Colour c) : ChessPiece(c){};
 
-int Bishop::getValue(){ return 3; }
+int Bishop::getValue() const { return 3; }
 
 void Bishop::refreshLegalMoves(int x, int y, Board &b)
 {
+    // Remove all old legal moves
     validMoves.clear();
     int newX, newY;
 
@@ -459,8 +463,10 @@ void Bishop::refreshLegalMoves(int x, int y, Board &b)
         newY--;
     }
 }
-PieceType Bishop::getType() { return PieceType::BISHOP; }
-char Bishop::getPieceChar()
+
+PieceType Bishop::getType() const { return PieceType::BISHOP; }
+
+char Bishop::getPieceChar() const
 {
     if (getColour() == Colour::White)
     {
@@ -477,10 +483,11 @@ King::King(Colour c) : ChessPiece(c), moved(false){};
 void King::setMoved(bool b) { moved = b; }
 bool King::getMoved() { return moved; }
 
-int King::getValue() { return 15; } //It is the most important piece
+int King::getValue() const { return 15; } //It is the most important piece
 
 void King::refreshLegalMoves(int x, int y, Board &b)
 {
+    // Remove all old legal moves
     validMoves.clear();
 
     Colour myColour = getColour();
@@ -691,8 +698,9 @@ void King::refreshLegalMoves(int x, int y, Board &b)
     }
 }
 
-PieceType King::getType() { return PieceType::KING; }
-char King::getPieceChar()
+PieceType King::getType() const { return PieceType::KING; }
+
+char King::getPieceChar() const
 {
     if (getColour() == Colour::White)
     {
@@ -705,8 +713,10 @@ char King::getPieceChar()
 }
 
 Queen::Queen(Colour c) : ChessPiece(c){};
+
 void Queen::refreshLegalMoves(int x, int y, Board &b)
 {
+    // Remove all old legal moves
     validMoves.clear();
     int newX, newY;
 
@@ -910,11 +920,12 @@ void Queen::refreshLegalMoves(int x, int y, Board &b)
         newY--;
     }
 }
-PieceType Queen::getType() { return PieceType::QUEEN; }
 
-int Queen::getValue() {return 8;}
+PieceType Queen::getType() const { return PieceType::QUEEN; }
 
-char Queen::getPieceChar()
+int Queen::getValue() const {return 8;}
+
+char Queen::getPieceChar() const
 {
     if (getColour() == Colour::White)
     {
@@ -928,7 +939,7 @@ char Queen::getPieceChar()
 
 Knight::Knight(Colour c) : ChessPiece(c){};
 
-int Knight::getValue(){ return 3; }
+int Knight::getValue() const { return 3; }
 
 void Knight::refreshLegalMoves(int x, int y, Board &b)
 {
@@ -1131,8 +1142,10 @@ void Knight::refreshLegalMoves(int x, int y, Board &b)
         }
     }
 }
-PieceType Knight::getType() { return PieceType::KNIGHT; }
-char Knight::getPieceChar()
+
+PieceType Knight::getType() const { return PieceType::KNIGHT; }
+
+char Knight::getPieceChar() const
 {
     if (getColour() == Colour::White)
     {

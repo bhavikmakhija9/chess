@@ -61,17 +61,17 @@ void Square::setCoords(int x, int y)
     this->y = y;
 }
 
-int Square::getX()
+int Square::getX() const
 {
     return x;
 }
 
-int Square::getY()
+int Square::getY() const
 {
     return y;
 }
 
-Colour Square::getColour()
+Colour Square::getColour() const
 {
     return myC;
 }
@@ -115,14 +115,6 @@ Square::~Square()
 }
 
 Board::Board() {}
-
-Board &Board::operator=(const Board &other)
-{
-    board = other.board;
-    return *this;
-}
-
-Board ::Board(const Board &other) { board = other.board; }
 
 void Board::clearBoard()
 {
@@ -194,7 +186,7 @@ void Board::defBoard()
             }
         }
 
-        // Set coords of the row
+        // Set coords of the row and the colour of the squares
         for (int j = 0; j < boardDim; j++)
         {
             board[i][j].setCoords(i, j);
@@ -231,10 +223,6 @@ void Board::refreshForEnPassant(Colour c)
 
 void Board::makeMove(int x, int y, int newx, int newy)
 {
-
-    // For En Passant penis
-    // penis
-    // refreshForEnPassant(getSquare(x, y)->getColour());
 
     // For Castling
     if (board[x][y].getPiece()->getType() == KING)
